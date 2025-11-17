@@ -10,53 +10,77 @@ document.getElementById('provisionForm')?.addEventListener('submit', async (e) =
     const role = document.getElementById('role').value;
     const username = (firstName.charAt(0) + lastName).toLowerCase();
     
-    const console = document.getElementById('console');
-    console.innerHTML = '';
+    const consoleEl = document.getElementById('console');
+    consoleEl.innerHTML = '';
     
-    // Simulate provisioning workflow
     const steps = [
-        { delay: 500, text: 🔄 Starting provisioning for  ... },
-        { delay: 1000, text: 📝 Validating user data... },
-        { delay: 1500, text: ✅ Validation complete },
-        { delay: 2000, text: 🔐 Creating AWS IAM user:  },
-        { delay: 2500, text: ✅ IAM user created: arn:aws:iam::123456789012:user/ },
-        { delay: 3000, text: 🔑 Generating access keys... },
-        { delay: 3500, text: ✅ Access keys created: AKIA************ },
-        { delay: 4000, text: 📦 Storing encrypted credentials in S3... },
-        { delay: 4500, text: ✅ Credentials stored: s3://iam-credentials/.json },
-        { delay: 5000, text: 👥 Adding to department group:  },
-        { delay: 5500, text: ✅ Added to group: GRP_ },
-        { delay: 6000, text: 🔒 Attaching role-based policy:  },
-        { delay: 6500, text: ✅ Policy attached:  },
-        { delay: 7000, text: 📧 Sending notification via SNS... },
-        { delay: 7500, text: ✅ Notification sent to manager },
-        { delay: 8000, text: 📊 Logging audit event... },
-        { delay: 8500, text: ✅ Audit log written to CloudTrail },
-        { delay: 9000, text: `, html: <div style="color: #10B981; font-weight: bold; font-size: 1.1rem;">━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div> },
-        { delay: 9200, text: ✨ PROVISIONING COMPLETE ✨, color: '#10B981' },
-        { delay: 9400, text: `, html: <div style="color: #10B981; font-weight: bold; font-size: 1.1rem;">━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div> },
-        { delay: 9600, text: 📋 Summary: },
-        { delay: 9800, text:    Username:  },
-        { delay: 10000, text:    Email:  },
-        { delay: 10200, text:    Department:  },
-        { delay: 10400, text:    Role:  },
-        { delay: 10600, text:    Status: ✅ Active },
-        { delay: 11000, text: ⏱️ Total time: 8.5 seconds },
-        { delay: 11500, text: 💾 User data archived for compliance }
+        { delay: 0, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA' },
+        { delay: 100, text: '🔄 IAM Provisioning Workflow Started', color: '#60A5FA' },
+        { delay: 300, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA' },
+        { delay: 600, text: '' },
+        { delay: 800, text: '📝 User: ' + firstName + ' ' + lastName },
+        { delay: 1200, text: '📧 Email: ' + email },
+        { delay: 1600, text: '🏢 Department: ' + department },
+        { delay: 2000, text: '👤 Role: ' + role },
+        { delay: 2400, text: '' },
+        { delay: 2600, text: '🔍 Validating user data...', color: '#F59E0B' },
+        { delay: 3200, text: '✅ Validation passed', color: '#10B981' },
+        { delay: 3600, text: '' },
+        { delay: 3800, text: '🔐 Creating AWS IAM user...', color: '#F59E0B' },
+        { delay: 4400, text: '✅ IAM user created: ' + username, color: '#10B981' },
+        { delay: 4800, text: '   ARN: arn:aws:iam::123456789012:user/' + username, color: '#6B7280' },
+        { delay: 5200, text: '' },
+        { delay: 5400, text: '🔑 Generating access keys...', color: '#F59E0B' },
+        { delay: 6000, text: '✅ Access keys generated', color: '#10B981' },
+        { delay: 6300, text: '   Access Key: AKIAXXXXXXXXXXXXXXXX', color: '#6B7280' },
+        { delay: 6600, text: '' },
+        { delay: 6800, text: '📦 Storing credentials in S3...', color: '#F59E0B' },
+        { delay: 7400, text: '✅ Stored: s3://iam-creds/' + username + '.json', color: '#10B981' },
+        { delay: 7700, text: '   Encryption: AES-256', color: '#6B7280' },
+        { delay: 8000, text: '' },
+        { delay: 8200, text: '👥 Adding to Department-' + department, color: '#F59E0B' },
+        { delay: 8800, text: '✅ Group membership assigned', color: '#10B981' },
+        { delay: 9100, text: '' },
+        { delay: 9300, text: '🔒 Attaching policy: ' + getRolePolicy(role), color: '#F59E0B' },
+        { delay: 9900, text: '✅ Policy attached', color: '#10B981' },
+        { delay: 10200, text: '' },
+        { delay: 10400, text: '📧 Sending SNS notification...', color: '#F59E0B' },
+        { delay: 11000, text: '✅ Manager notified', color: '#10B981' },
+        { delay: 11300, text: '' },
+        { delay: 11500, text: '📊 Writing to CloudTrail...', color: '#F59E0B' },
+        { delay: 12100, text: '✅ Audit event logged', color: '#10B981' },
+        { delay: 12400, text: '' },
+        { delay: 12600, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981' },
+        { delay: 12800, text: '✨ PROVISIONING COMPLETE ✨', color: '#10B981', bold: true },
+        { delay: 13000, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981' },
+        { delay: 13200, text: '' },
+        { delay: 13400, text: '📋 SUMMARY:', color: '#60A5FA', bold: true },
+        { delay: 13600, text: '   👤 Username: ' + username },
+        { delay: 13800, text: '   📧 Email: ' + email },
+        { delay: 14000, text: '   🏢 Department: ' + department },
+        { delay: 14200, text: '   💼 Role: ' + role },
+        { delay: 14400, text: '   ✅ Status: Active' },
+        { delay: 14600, text: '   🔐 MFA: Required on first login' },
+        { delay: 14800, text: '' },
+        { delay: 15000, text: '⏱️  Execution time: 8.7 seconds', color: '#60A5FA' },
+        { delay: 15200, text: '💾 Data archived for compliance', color: '#60A5FA' },
+        { delay: 15400, text: '🎉 Welcome, ' + firstName + '!', color: '#10B981' }
     ];
     
-    for (const step of steps) {
-        await new Promise(resolve => setTimeout(resolve, step.delay - (steps[steps.indexOf(step) - 1]?.delay || 0)));
+    for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        const prevDelay = i > 0 ? steps[i - 1].delay : 0;
+        await new Promise(r => setTimeout(r, step.delay - prevDelay));
+        
         const line = document.createElement('div');
         line.className = 'console-line';
-        if (step.html) {
-            line.innerHTML = step.html;
-        } else {
-            line.textContent = step.text;
-            if (step.color) line.style.color = step.color;
-        }
-        console.appendChild(line);
-        console.scrollTop = console.scrollHeight;
+        line.textContent = step.text;
+        
+        if (step.color) line.style.color = step.color;
+        if (step.bold) line.style.fontWeight = 'bold';
+        
+        consoleEl.appendChild(line);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 });
 
@@ -70,26 +94,14 @@ function getRolePolicy(role) {
     return policies[role] || 'ReadOnlyAccess';
 }
 
-function showProvision() {
-    document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
-}
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
 
-function showDeprovision() {
-    alert('De-provisioning demo coming soon!');
-}
-
-function showCompliance() {
-    alert('Compliance dashboard coming soon!');
-}
-
-function showAudit() {
-    alert('Audit logs viewer coming soon!');
-}
-
-function showScripts() {
-    window.open('https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project/tree/main/scripts', '_blank');
-}
-
-function showAWS() {
-    alert('AWS integration details: IAM, S3, SNS, CloudTrail');
-}
+console.log('🚀 IAM Dashboard loaded successfully');
