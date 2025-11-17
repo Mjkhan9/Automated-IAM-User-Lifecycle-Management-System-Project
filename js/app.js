@@ -330,14 +330,354 @@ function scrollToDemo() {
 }
 
 function showFeatureDetails(feature) {
-    const messages = {
-        'deprovision': 'De-provisioning workflow automates account deactivation, access revocation, and compliance archiving when employees transition roles or leave the organization.',
-        'compliance': 'Compliance dashboard provides real-time monitoring of dormant accounts, policy violations, and access certifications with automated remediation workflows.',
-        'audit': 'Audit logging system maintains comprehensive 7-year encrypted trails of all IAM operations with CloudTrail integration for forensic analysis and compliance reporting.',
-        'aws': 'AWS Integration seamlessly connects with IAM, S3, SNS, CloudTrail, and other AWS services to provide complete cloud infrastructure automation and monitoring.'
-    };
+    switch(feature) {
+        case 'deprovision':
+            showDeprovisionWorkflow();
+            break;
+        case 'compliance':
+            showComplianceDashboard();
+            break;
+        case 'audit':
+            showAuditLogs();
+            break;
+        case 'aws':
+            showAWSIntegration();
+            break;
+        default:
+            showNotification('Feature details coming soon!', 'info');
+    }
+}
+
+function showComplianceDashboard() {
+    const modal = createModal('Compliance Dashboard', `
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">Total Users</span>
+                </div>
+                <div class="dashboard-card-value">8,247</div>
+                <div class="dashboard-card-label">Active accounts</div>
+                <div class="dashboard-card-trend up">↑ 3.2% from last month</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">Dormant Accounts</span>
+                </div>
+                <div class="dashboard-card-value">127</div>
+                <div class="dashboard-card-label">Inactive > 90 days</div>
+                <div class="dashboard-card-trend down">↓ 15% from last month</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">Compliance Score</span>
+                </div>
+                <div class="dashboard-card-value">98.5%</div>
+                <div class="dashboard-card-label">Policy adherence</div>
+                <div class="dashboard-card-trend up">↑ 2.1% from last month</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">Pending Reviews</span>
+                </div>
+                <div class="dashboard-card-value">43</div>
+                <div class="dashboard-card-label">Access certifications</div>
+                <div class="dashboard-card-trend">Due within 7 days</div>
+            </div>
+        </div>
+        
+        <h4 style="margin: 2rem 0 1rem; color: var(--text-primary); font-size: 1.25rem;">Recent Compliance Alerts</h4>
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Alert Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>john.smith@company.com</td>
+                    <td>Dormant Account</td>
+                    <td><span class="status-badge warning">Review</span></td>
+                    <td>Nov 15, 2024</td>
+                    <td>Verify activity</td>
+                </tr>
+                <tr>
+                    <td>sarah.johnson@company.com</td>
+                    <td>Excessive Permissions</td>
+                    <td><span class="status-badge warning">Review</span></td>
+                    <td>Nov 14, 2024</td>
+                    <td>Policy review</td>
+                </tr>
+                <tr>
+                    <td>mike.davis@company.com</td>
+                    <td>MFA Not Enabled</td>
+                    <td><span class="status-badge inactive">Action Required</span></td>
+                    <td>Nov 13, 2024</td>
+                    <td>Enable MFA</td>
+                </tr>
+                <tr>
+                    <td>emily.wilson@company.com</td>
+                    <td>Access Certification</td>
+                    <td><span class="status-badge active">Completed</span></td>
+                    <td>Nov 12, 2024</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>david.brown@company.com</td>
+                    <td>Password Expiry</td>
+                    <td><span class="status-badge warning">Pending</span></td>
+                    <td>Nov 10, 2024</td>
+                    <td>Password reset</td>
+                </tr>
+            </tbody>
+        </table>
+    `);
+    showModal(modal);
+}
+
+function showAuditLogs() {
+    const modal = createModal('Audit Logs', `
+        <h4 style="margin-bottom: 1.5rem; color: var(--text-primary);">Recent IAM Activities</h4>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 14:23:45 UTC</div>
+            <div class="audit-log-action">User Provisioned: john.doe@company.com</div>
+            <div class="audit-log-details">Created IAM user with Developer role in IT department. Access keys generated and stored in S3. Manager notification sent via SNS.</div>
+        </div>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 13:15:22 UTC</div>
+            <div class="audit-log-action">Policy Attached: sarah.johnson@company.com</div>
+            <div class="audit-log-details">Attached PowerUserAccess policy. Modified by: admin@company.com. Reason: Role change to Senior Developer.</div>
+        </div>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 11:45:10 UTC</div>
+            <div class="audit-log-action">Account Deactivated: mike.davis@company.com</div>
+            <div class="audit-log-details">Account disabled due to employment termination. Access keys revoked. Data archived to S3://compliance-archive/2024/11/.</div>
+        </div>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 10:30:55 UTC</div>
+            <div class="audit-log-action">Group Membership Changed: emily.wilson@company.com</div>
+            <div class="audit-log-details">Added to group: Department-Finance. Previous groups: Department-HR. Modified by: hr-admin@company.com.</div>
+        </div>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 09:12:33 UTC</div>
+            <div class="audit-log-action">MFA Enabled: david.brown@company.com</div>
+            <div class="audit-log-details">Multi-factor authentication configured successfully. Device: Virtual MFA. Setup initiated by user.</div>
+        </div>
+        
+        <div class="audit-log-entry">
+            <div class="audit-log-time">2024-11-17 08:05:18 UTC</div>
+            <div class="audit-log-action">Access Key Rotated: system-service-account</div>
+            <div class="audit-log-details">Automated key rotation completed. Old key deactivated. New key stored securely. Next rotation: 2025-02-17.</div>
+        </div>
+        
+        <p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.875rem;">
+            📊 All audit logs are encrypted and stored in S3 with 7-year retention for compliance.
+            CloudTrail integration provides complete forensic analysis capabilities.
+        </p>
+    `);
+    showModal(modal);
+}
+
+function showDeprovisionWorkflow() {
+    const modal = createModal('De-provisioning Workflow', `
+        <h4 style="margin-bottom: 1.5rem; color: var(--text-primary);">Automated Account Deactivation Process</h4>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">1</div>
+            <div class="workflow-step-content">
+                <h4>Trigger Event Detection</h4>
+                <p>System detects termination event from HR system (Workday/SAP) or manual trigger by administrator. Workflow initiates automatically within 5 minutes of event detection.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">2</div>
+            <div class="workflow-step-content">
+                <h4>Account Suspension</h4>
+                <p>User account is immediately disabled in Active Directory and AWS IAM. Login access is revoked across all systems. Existing sessions are terminated within 15 minutes.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">3</div>
+            <div class="workflow-step-content">
+                <h4>Access Revocation</h4>
+                <p>All AWS access keys are deactivated. Group memberships are removed. IAM policies are detached. VPN and network access is revoked immediately.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">4</div>
+            <div class="workflow-step-content">
+                <h4>Data Archival</h4>
+                <p>User data is backed up to S3 with AES-256 encryption. Home directory contents, email archives, and project files are preserved for 7 years per compliance requirements.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">5</div>
+            <div class="workflow-step-content">
+                <h4>Notification & Audit</h4>
+                <p>Manager receives notification via SNS. IT Security team is alerted. Complete audit trail is logged to CloudTrail. Exit checklist is generated for final review.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="workflow-step-number">6</div>
+            <div class="workflow-step-content">
+                <h4>Account Deletion</h4>
+                <p>After 90-day retention period, account is permanently deleted. All credentials are destroyed. Final compliance report is generated and archived.</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 8px; border-left: 4px solid var(--success);">
+            <strong style="color: var(--text-primary);">Key Benefits:</strong>
+            <ul style="margin-top: 0.75rem; margin-left: 1.25rem; color: var(--text-secondary);">
+                <li>Automated execution reduces human error</li>
+                <li>Immediate security posture improvement</li>
+                <li>Full compliance with SOX, HIPAA, GDPR requirements</li>
+                <li>Complete audit trail for forensic analysis</li>
+                <li>Zero manual intervention required</li>
+            </ul>
+        </div>
+    `);
+    showModal(modal);
+}
+
+function showAWSIntegration() {
+    const modal = createModal('AWS Service Integration', `
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">AWS IAM</span>
+                </div>
+                <div class="dashboard-card-label" style="margin-top: 1rem;">User and policy management, role-based access control, credential generation</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">Amazon S3</span>
+                </div>
+                <div class="dashboard-card-label" style="margin-top: 1rem;">Encrypted credential storage, data archival, compliance retention</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">AWS SNS</span>
+                </div>
+                <div class="dashboard-card-label" style="margin-top: 1rem;">Real-time notifications, alert distribution, workflow triggers</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <span class="dashboard-card-title">CloudTrail</span>
+                </div>
+                <div class="dashboard-card-label" style="margin-top: 1rem;">Complete audit logging, forensic analysis, compliance reporting</div>
+            </div>
+        </div>
+        
+        <h4 style="margin: 2rem 0 1rem; color: var(--text-primary); font-size: 1.25rem;">Integration Architecture</h4>
+        
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            <strong style="color: var(--text-primary);">IAM Provisioning Flow:</strong>
+            <p style="margin-top: 0.75rem; color: var(--text-secondary); line-height: 1.6;">
+                Python/PowerShell scripts → AWS SDK (Boto3) → IAM User Creation → Policy Attachment → 
+                Access Key Generation → S3 Encryption → SNS Notification → CloudTrail Logging
+            </p>
+        </div>
+        
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            <strong style="color: var(--text-primary);">Security Features:</strong>
+            <ul style="margin-top: 0.75rem; margin-left: 1.25rem; color: var(--text-secondary); line-height: 1.6;">
+                <li>AES-256-GCM encryption for all stored credentials</li>
+                <li>S3 bucket policies with least-privilege access</li>
+                <li>IAM roles for service-to-service authentication</li>
+                <li>CloudTrail logs encrypted and immutable</li>
+                <li>SNS topic encryption with KMS keys</li>
+            </ul>
+        </div>
+        
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px;">
+            <strong style="color: var(--text-primary);">Compliance & Audit:</strong>
+            <p style="margin-top: 0.75rem; color: var(--text-secondary); line-height: 1.6;">
+                7-year retention in S3 Glacier for long-term compliance. CloudTrail provides complete 
+                forensic audit trails. Automated compliance reports generated monthly. SOC 2, HIPAA, 
+                and GDPR compliant architecture.
+            </p>
+        </div>
+    `);
+    showModal(modal);
+}
+
+function createModal(title, content) {
+    const modalHTML = `
+        <div class="modal-overlay" id="featureModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${title}</h3>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    ${content}
+                </div>
+            </div>
+        </div>
+    `;
+    return modalHTML;
+}
+
+function showModal(modalHTML) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('featureModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
     
-    showNotification(messages[feature] || 'Feature details coming soon!', 'info');
+    // Add new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Show modal
+    setTimeout(() => {
+        document.getElementById('featureModal').classList.add('active');
+    }, 10);
+    
+    // Close on overlay click
+    document.getElementById('featureModal').addEventListener('click', (e) => {
+        if (e.target.id === 'featureModal') {
+            closeModal();
+        }
+    });
+    
+    // Close on ESC key
+    document.addEventListener('keydown', handleEscKey);
+}
+
+function closeModal() {
+    const modal = document.getElementById('featureModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.remove();
+            document.removeEventListener('keydown', handleEscKey);
+        }, 300);
+    }
+}
+
+function handleEscKey(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
 }
 
 function showNotification(message, type = 'info') {
