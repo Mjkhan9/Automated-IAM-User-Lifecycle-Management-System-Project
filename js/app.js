@@ -105,3 +105,25 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 console.log('🚀 IAM Dashboard loaded successfully');
+// ================================
+// PAGE NAVIGATION HANDLERS (FIX)
+// ================================
+function showProvision() {
+    document.querySelector('#provision')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function showDeprovision() {
+    window.location.href = "deprovision.html";
+}
+
+function showCompliance() {
+    window.location.href = "compliance.html";
+}
+
+function showAudit() {
+    window.location.href = "audit.html";
+}
+
+function showScripts() {
+    window.location.href = "scripts.html";
+}
