@@ -11,40 +11,41 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
                     <rect width="40" height="40" rx="8" fill="#2563EB"/>
                     <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <h1>IAM Lifecycle Automation</h1>
             </div>
-            <nav>
+            <nav aria-label="Primary">
                 <a href="#dashboard" class="active">Dashboard</a>
                 <a href="#provision">Provision</a>
+                <a href="#deprovision">De-provision</a>
                 <a href="#audit">Audit Logs</a>
                 <a href="#compliance">Compliance</a>
             </nav>
         </header>
 
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero" id="dashboard">
             <div class="hero-content">
                 <h2>Enterprise Identity Management Platform</h2>
                 <p>Automate user provisioning, de-provisioning, and compliance monitoring across Active Directory and AWS environments</p>
                 <div class="stats">
                     <div class="stat-card">
-                        <div class="stat-number">8,000+</div>
+                        <div class="stat-number" id="kpi-users">8,000+</div>
                         <div class="stat-label">Users Managed</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">40%</div>
+                        <div class="stat-number" id="kpi-savings">40%</div>
                         <div class="stat-label">Time Savings</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">100%</div>
+                        <div class="stat-number" id="kpi-compliance">100%</div>
                         <div class="stat-label">Compliance</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number" id="kpi-incidents">0</div>
                         <div class="stat-label">Security Incidents</div>
                     </div>
                 </div>
@@ -52,7 +53,7 @@
         </section>
 
         <!-- Features Grid -->
-        <section class="features">
+        <section class="features" id="features">
             <h3>Key Features</h3>
             <div class="feature-grid">
                 <div class="feature-card">
@@ -100,29 +101,43 @@
         </section>
 
         <!-- Live Demo Section -->
-        <section class="demo-section" id="demo">
+        <section class="demo-section" id="provision">
             <h3>Interactive Demo: User Provisioning</h3>
             <div class="demo-container">
                 <div class="demo-input">
                     <h4>User Information</h4>
                     <form id="provisionForm">
-                        <input type="text" placeholder="First Name" id="firstName" required>
-                        <input type="text" placeholder="Last Name" id="lastName" required>
-                        <input type="email" placeholder="Email" id="email" required>
-                        <select id="department">
+                        <input type="text" placeholder="First Name" id="firstName" aria-label="First Name" required>
+                        <input type="text" placeholder="Last Name" id="lastName" aria-label="Last Name" required>
+                        <input type="email" placeholder="Email" id="email" aria-label="Email" required>
+                        <select id="department" aria-label="Department">
                             <option value="">Select Department</option>
                             <option value="IT">IT</option>
                             <option value="Finance">Finance</option>
                             <option value="HR">HR</option>
                             <option value="Marketing">Marketing</option>
                         </select>
-                        <select id="role">
+                        <select id="role" aria-label="Role">
                             <option value="">Select Role</option>
                             <option value="Developer">Developer</option>
                             <option value="Analyst">Analyst</option>
                             <option value="Admin">Admin</option>
                             <option value="Manager">Manager</option>
                         </select>
+                        <div class="policy-preview" aria-live="polite">
+                            <div class="preview-header">
+                                <div>
+                                    <p class="eyebrow">IAM Policy Preview</p>
+                                    <h5 id="policyTitle">Select a role to view policy</h5>
+                                </div>
+                                <span class="badge" id="policyScope">AWS IAM</span>
+                            </div>
+                            <pre id="policyPreview" class="json-block">{
+  "Version": "2012-10-17",
+  "Statement": []
+}</pre>
+                        </div>
+                        <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
                         <button type="submit" class="btn-primary">Provision User</button>
                     </form>
                 </div>
@@ -133,7 +148,182 @@
                         <div class="console-line">IAM Automation System Ready...</div>
                         <div class="console-line">Waiting for input...</div>
                     </div>
+                    <div class="credential-card" aria-live="polite">
+                        <div class="credential-header">
+                            <div>
+                                <p class="eyebrow">Generated Credentials</p>
+                                <h5 id="generatedUser">No user provisioned yet</h5>
+                            </div>
+                            <span class="badge badge-success" id="credentialStatus">Idle</span>
+                        </div>
+                        <div class="credential-body">
+                            <div>
+                                <p class="label">Username</p>
+                                <p id="credentialUsername" class="value">-</p>
+                            </div>
+                            <div>
+                                <p class="label">Access Key</p>
+                                <p id="credentialKey" class="value">-</p>
+                            </div>
+                            <div>
+                                <p class="label">S3 Location</p>
+                                <p id="credentialS3" class="value">-</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="deprovision" id="deprovision">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Automated Offboarding</p>
+                    <h3>De-provisioning Workflow</h3>
+                    <p class="lead">Mirror the production runbook: disable accounts, revoke access keys, and capture a tamper-proof audit trail.</p>
+                </div>
+                <div class="pill-group">
+                    <span class="badge">AD</span>
+                    <span class="badge">AWS IAM</span>
+                    <span class="badge">S3 Archive</span>
+                    <span class="badge">CloudTrail</span>
+                </div>
+            </div>
+            <div class="timeline" id="deprovisionTimeline">
+                <div class="timeline-item">
+                    <div class="timeline-icon">1</div>
+                    <div>
+                        <h4>Disable AD & IAM Accounts</h4>
+                        <p>Immediately block sign-ins and federated access while keeping the profile for retention.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">2</div>
+                    <div>
+                        <h4>Revoke Access Keys & Sessions</h4>
+                        <p>Rotate or delete keys, kill active sessions, and remove from privileged groups.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">3</div>
+                    <div>
+                        <h4>Archive Home & S3 Data</h4>
+                        <p>Encrypt and store user data in S3 with lifecycle policies for 7-year retention.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">4</div>
+                    <div>
+                        <h4>Create Immutable Audit Trail</h4>
+                        <p>Record every step to CloudTrail and SNS for SOC notifications.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="audit" id="audit">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Audit Evidence</p>
+                    <h3>Audit Log Viewer</h3>
+                    <p class="lead">Filter activity across provisioning, de-provisioning, and policy changes. Data is seeded for demo purposes.</p>
+                </div>
+                <div class="kpi-strip">
+                    <div class="kpi">
+                        <p class="label">24h Events</p>
+                        <h4 id="kpiEvents">0</h4>
+                    </div>
+                    <div class="kpi">
+                        <p class="label">Provisioning</p>
+                        <h4 id="kpiProvisioning">0</h4>
+                    </div>
+                    <div class="kpi">
+                        <p class="label">De-provisioning</p>
+                        <h4 id="kpiDeprovisioning">0</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="audit-grid">
+                <div class="audit-filters">
+                    <label for="filterUser">User</label>
+                    <input id="filterUser" type="text" placeholder="Search by user" aria-label="Filter by user">
+                    <label for="filterAction">Action</label>
+                    <select id="filterAction" aria-label="Filter by action">
+                        <option value="">All actions</option>
+                        <option value="Provision">Provision</option>
+                        <option value="Deprovision">De-provision</option>
+                        <option value="Policy">Policy</option>
+                    </select>
+                    <label for="filterDate">Date</label>
+                    <input id="filterDate" type="date" aria-label="Filter by date">
+                    <button class="btn-primary" id="applyFilters" type="button">Apply Filters</button>
+                </div>
+                <div class="audit-table-wrapper">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>System</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="compliance" id="compliance">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Risk & Compliance</p>
+                    <h3>Compliance Dashboard</h3>
+                    <p class="lead">Monitor MFA adoption, dormant accounts, and access certifications. All metrics update live from demo data.</p>
+                </div>
+                <div class="pill-group">
+                    <span class="badge">SOC2</span>
+                    <span class="badge">ISO 27001</span>
+                    <span class="badge">HIPAA</span>
+                </div>
+            </div>
+            <div class="compliance-grid">
+                <div class="compliance-card">
+                    <p class="label">MFA Coverage</p>
+                    <h4 id="mfaCoverage">-</h4>
+                    <div class="progress">
+                        <div id="mfaBar" class="progress-bar"></div>
+                    </div>
+                    <p class="muted">Target: 95%+</p>
+                </div>
+                <div class="compliance-card">
+                    <p class="label">Dormant Accounts</p>
+                    <h4 id="dormantCount">-</h4>
+                    <p class="muted">Last 30 days across AD + IAM</p>
+                </div>
+                <div class="compliance-card">
+                    <p class="label">Access Reviews</p>
+                    <h4 id="accessCert">-</h4>
+                    <p class="muted">Quarterly certification completion</p>
+                </div>
+            </div>
+            <div class="dormant-table">
+                <div class="table-header">
+                    <h4>Top Dormant Users</h4>
+                    <span class="badge">Auto-disable @ 45 days</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>System</th>
+                            <th>Last Seen (days)</th>
+                            <th>Next Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dormantBody"></tbody>
+                </table>
             </div>
         </section>
 
@@ -152,6 +342,31 @@
                 </div>
                 <div class="tech-item">
                     <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
+                </div>
+            </div>
+        </section>
+
+        <section class="runbook" id="aws">
+            <div class="runbook-card">
+                <div>
+                    <p class="eyebrow">Runbook</p>
+                    <h3>Production-ready steps</h3>
+                    <p class="lead">Map the UI to real automation. Reuse the included PowerShell scripts, then extend with Lambda or Step Functions.</p>
+                </div>
+                <div class="runbook-actions">
+                    <div class="runbook-step">
+                        <span class="badge">1</span>
+                        <p>Clone the repo and run the PowerShell onboarding scripts for AD group creation.</p>
+                    </div>
+                    <div class="runbook-step">
+                        <span class="badge">2</span>
+                        <p>Expose a lightweight Flask/FastAPI endpoint to receive provisioning requests from this UI.</p>
+                    </div>
+                    <div class="runbook-step">
+                        <span class="badge">3</span>
+                        <p>Publish audit events to CloudTrail and SNS; stream to SIEM for alerting.</p>
+                    </div>
+                    <button class="btn-primary" onclick="showScripts()">Open Scripts</button>
                 </div>
             </div>
         </section>
