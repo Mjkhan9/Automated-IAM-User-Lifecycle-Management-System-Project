@@ -6,12 +6,38 @@
 // Initialize on DOM Load
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
     initializeAnimations();
     initializeScrollEffects();
     initializeNavigation();
     initializeProvisioningDemo();
     initializeCounters();
+    initializeSearch();
+    initializeKeyboardShortcuts();
+    initializeMobileMenu();
 });
+
+// ========================================
+// Theme Management
+// ========================================
+function initializeTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            showToast('Theme changed', `Switched to ${newTheme} mode`, 'success');
+        });
+    }
+}
 
 // ========================================
 // Scroll-based Animations
@@ -102,18 +128,143 @@ function initializeNavigation() {
                     link.classList.remove('active');
                 });
                 this.classList.add('active');
+                
+                // Close mobile menu if open
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                if (mobileMenu && mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
             }
         });
     });
-    
-    // Mobile menu toggle
+}
+
+// ========================================
+// Mobile Menu
+// ========================================
+function initializeMobileMenu() {
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-    const nav = document.querySelector('.nav');
+    const mobileMenu = document.getElementById('mobileMenu');
     
-    if (mobileMenuToggle) {
+    if (mobileMenuToggle && mobileMenu) {
         mobileMenuToggle.addEventListener('click', () => {
-            nav.classList.toggle('mobile-active');
+            mobileMenu.classList.toggle('active');
             mobileMenuToggle.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.mobile-menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+            });
+        });
+    }
+}
+
+// ========================================
+// Search Functionality
+// ========================================
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm.length < 2) {
+                // Clear any previous highlights
+                return;
+            }
+            
+            // Search through feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            let foundCount = 0;
+            
+            featureCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    card.style.outline = '2px solid var(--primary)';
+                    foundCount++;
+                } else {
+                    card.style.display = 'none';
+                    card.style.outline = 'none';
+                }
+            });
+            
+            if (searchTerm && foundCount === 0) {
+                showToast('No results', `No features found matching "${searchTerm}"`, 'info');
+            }
+        });
+        
+        // Clear search on escape
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    card.style.display = 'block';
+                    card.style.outline = 'none';
+                });
+            }
+        });
+    }
+}
+
+// ========================================
+// Keyboard Shortcuts
+// ========================================
+function initializeKeyboardShortcuts() {
+    const shortcutsHelp = document.getElementById('shortcutsHelp');
+    
+    document.addEventListener('keydown', (e) => {
+        // Don't trigger shortcuts when typing in inputs
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+            return;
+        }
+        
+        switch(e.key) {
+            case '?':
+                e.preventDefault();
+                if (shortcutsHelp) {
+                    shortcutsHelp.classList.toggle('active');
+                }
+                break;
+            case '/':
+                e.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+                break;
+            case 'd':
+            case 'D':
+                e.preventDefault();
+                scrollToDemo();
+                break;
+            case 't':
+            case 'T':
+                e.preventDefault();
+                document.getElementById('themeToggle')?.click();
+                break;
+            case 'Escape':
+                // Close modals
+                closeModal();
+                if (shortcutsHelp) {
+                    shortcutsHelp.classList.remove('active');
+                }
+                break;
+        }
+    });
+    
+    // Close shortcuts help when clicking outside
+    if (shortcutsHelp) {
+        shortcutsHelp.addEventListener('click', (e) => {
+            if (e.target === shortcutsHelp) {
+                shortcutsHelp.classList.remove('active');
+            }
         });
     }
 }
@@ -179,10 +330,14 @@ function initializeProvisioningDemo() {
         const provisionBtn = document.getElementById('provisionBtn');
         const consoleEl = document.getElementById('console');
         const executionTimeEl = document.getElementById('executionTime');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
         
         statusEl.textContent = 'Processing';
         statusEl.className = 'demo-status processing';
         provisionBtn.disabled = true;
+        progressContainer.classList.add('active');
         
         // Clear console
         consoleEl.innerHTML = '';
@@ -191,57 +346,57 @@ function initializeProvisioningDemo() {
         
         // Provisioning workflow steps
         const steps = [
-            { delay: 0, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA', prompt: false },
-            { delay: 100, text: '🔄 IAM Provisioning Workflow Started', color: '#60A5FA', prompt: true },
-            { delay: 300, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA', prompt: false },
-            { delay: 600, text: '', prompt: false },
-            { delay: 800, text: `📝 User: ${firstName} ${lastName}`, color: '#E0E7FF', prompt: true },
-            { delay: 1200, text: `📧 Email: ${email}`, color: '#E0E7FF', prompt: true },
-            { delay: 1600, text: `🏢 Department: ${department}`, color: '#E0E7FF', prompt: true },
-            { delay: 2000, text: `👤 Role: ${role}`, color: '#E0E7FF', prompt: true },
-            { delay: 2400, text: '', prompt: false },
-            { delay: 2600, text: '🔍 Validating user data...', color: '#F59E0B', prompt: true },
-            { delay: 3200, text: '✅ Validation passed', color: '#10B981', prompt: true },
-            { delay: 3600, text: '', prompt: false },
-            { delay: 3800, text: '🔐 Creating AWS IAM user...', color: '#F59E0B', prompt: true },
-            { delay: 4400, text: `✅ IAM user created: ${username}`, color: '#10B981', prompt: true },
-            { delay: 4800, text: `   ARN: arn:aws:iam::123456789012:user/${username}`, color: '#6B7280', prompt: false },
-            { delay: 5200, text: '', prompt: false },
-            { delay: 5400, text: '🔑 Generating access keys...', color: '#F59E0B', prompt: true },
-            { delay: 6000, text: '✅ Access keys generated', color: '#10B981', prompt: true },
-            { delay: 6300, text: '   Access Key ID: AKIAXXXXXXXXXXXXXXXX', color: '#6B7280', prompt: false },
-            { delay: 6600, text: '', prompt: false },
-            { delay: 6800, text: '📦 Storing credentials in S3...', color: '#F59E0B', prompt: true },
-            { delay: 7400, text: `✅ Stored: s3://iam-credentials/${username}.json`, color: '#10B981', prompt: true },
-            { delay: 7700, text: '   Encryption: AES-256-GCM', color: '#6B7280', prompt: false },
-            { delay: 8000, text: '', prompt: false },
-            { delay: 8200, text: `👥 Adding to Department-${department} group...`, color: '#F59E0B', prompt: true },
-            { delay: 8800, text: `✅ Group membership assigned`, color: '#10B981', prompt: true },
-            { delay: 9100, text: '', prompt: false },
-            { delay: 9300, text: `🔒 Attaching policy: ${getRolePolicy(role)}`, color: '#F59E0B', prompt: true },
-            { delay: 9900, text: '✅ Policy attached successfully', color: '#10B981', prompt: true },
-            { delay: 10200, text: '', prompt: false },
-            { delay: 10400, text: '📧 Sending SNS notification...', color: '#F59E0B', prompt: true },
-            { delay: 11000, text: '✅ Manager notified via SNS', color: '#10B981', prompt: true },
-            { delay: 11300, text: '', prompt: false },
-            { delay: 11500, text: '📊 Writing to CloudTrail...', color: '#F59E0B', prompt: true },
-            { delay: 12100, text: '✅ Audit event logged', color: '#10B981', prompt: true },
-            { delay: 12400, text: '', prompt: false },
-            { delay: 12600, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981', prompt: false },
-            { delay: 12800, text: '✨ PROVISIONING COMPLETE ✨', color: '#10B981', prompt: false, bold: true },
-            { delay: 13000, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981', prompt: false },
-            { delay: 13200, text: '', prompt: false },
-            { delay: 13400, text: '📋 SUMMARY:', color: '#60A5FA', prompt: true, bold: true },
-            { delay: 13600, text: `   👤 Username: ${username}`, color: '#E0E7FF', prompt: false },
-            { delay: 13800, text: `   📧 Email: ${email}`, color: '#E0E7FF', prompt: false },
-            { delay: 14000, text: `   🏢 Department: ${department}`, color: '#E0E7FF', prompt: false },
-            { delay: 14200, text: `   💼 Role: ${role}`, color: '#E0E7FF', prompt: false },
-            { delay: 14400, text: '   ✅ Status: Active', color: '#10B981', prompt: false },
-            { delay: 14600, text: '   🔐 MFA: Required on first login', color: '#E0E7FF', prompt: false },
-            { delay: 14800, text: '', prompt: false },
-            { delay: 15000, text: '⏱️  Execution time: 8.7 seconds', color: '#60A5FA', prompt: true },
-            { delay: 15200, text: '💾 Data archived for compliance', color: '#60A5FA', prompt: true },
-            { delay: 15400, text: `🎉 Welcome aboard, ${firstName}!`, color: '#10B981', prompt: true, bold: true }
+            { delay: 0, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA', prompt: false, progress: 5 },
+            { delay: 100, text: '🔄 IAM Provisioning Workflow Started', color: '#60A5FA', prompt: true, progress: 10 },
+            { delay: 300, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA', prompt: false, progress: 15 },
+            { delay: 600, text: '', prompt: false, progress: 20 },
+            { delay: 800, text: `📝 User: ${firstName} ${lastName}`, color: '#E0E7FF', prompt: true, progress: 25 },
+            { delay: 1200, text: `📧 Email: ${email}`, color: '#E0E7FF', prompt: true, progress: 30 },
+            { delay: 1600, text: `🏢 Department: ${department}`, color: '#E0E7FF', prompt: true, progress: 35 },
+            { delay: 2000, text: `👤 Role: ${role}`, color: '#E0E7FF', prompt: true, progress: 40 },
+            { delay: 2400, text: '', prompt: false, progress: 45 },
+            { delay: 2600, text: '🔍 Validating user data...', color: '#F59E0B', prompt: true, progress: 50 },
+            { delay: 3200, text: '✅ Validation passed', color: '#10B981', prompt: true, progress: 55 },
+            { delay: 3600, text: '', prompt: false, progress: 60 },
+            { delay: 3800, text: '🔐 Creating AWS IAM user...', color: '#F59E0B', prompt: true, progress: 65 },
+            { delay: 4400, text: `✅ IAM user created: ${username}`, color: '#10B981', prompt: true, progress: 70 },
+            { delay: 4800, text: `   ARN: arn:aws:iam::123456789012:user/${username}`, color: '#6B7280', prompt: false, progress: 75 },
+            { delay: 5200, text: '', prompt: false, progress: 78 },
+            { delay: 5400, text: '🔑 Generating access keys...', color: '#F59E0B', prompt: true, progress: 80 },
+            { delay: 6000, text: '✅ Access keys generated', color: '#10B981', prompt: true, progress: 82 },
+            { delay: 6300, text: '   Access Key ID: AKIAXXXXXXXXXXXXXXXX', color: '#6B7280', prompt: false, progress: 84 },
+            { delay: 6600, text: '', prompt: false, progress: 86 },
+            { delay: 6800, text: '📦 Storing credentials in S3...', color: '#F59E0B', prompt: true, progress: 88 },
+            { delay: 7400, text: `✅ Stored: s3://iam-credentials/${username}.json`, color: '#10B981', prompt: true, progress: 90 },
+            { delay: 7700, text: '   Encryption: AES-256-GCM', color: '#6B7280', prompt: false, progress: 92 },
+            { delay: 8000, text: '', prompt: false, progress: 93 },
+            { delay: 8200, text: `👥 Adding to Department-${department} group...`, color: '#F59E0B', prompt: true, progress: 94 },
+            { delay: 8800, text: `✅ Group membership assigned`, color: '#10B981', prompt: true, progress: 95 },
+            { delay: 9100, text: '', prompt: false, progress: 96 },
+            { delay: 9300, text: `🔒 Attaching policy: ${getRolePolicy(role)}`, color: '#F59E0B', prompt: true, progress: 97 },
+            { delay: 9900, text: '✅ Policy attached successfully', color: '#10B981', prompt: true, progress: 98 },
+            { delay: 10200, text: '', prompt: false, progress: 99 },
+            { delay: 10400, text: '📧 Sending SNS notification...', color: '#F59E0B', prompt: true, progress: 99 },
+            { delay: 11000, text: '✅ Manager notified via SNS', color: '#10B981', prompt: true, progress: 100 },
+            { delay: 11300, text: '', prompt: false, progress: 100 },
+            { delay: 11500, text: '📊 Writing to CloudTrail...', color: '#F59E0B', prompt: true, progress: 100 },
+            { delay: 12100, text: '✅ Audit event logged', color: '#10B981', prompt: true, progress: 100 },
+            { delay: 12400, text: '', prompt: false, progress: 100 },
+            { delay: 12600, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981', prompt: false, progress: 100 },
+            { delay: 12800, text: '✨ PROVISIONING COMPLETE ✨', color: '#10B981', prompt: false, bold: true, progress: 100 },
+            { delay: 13000, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981', prompt: false, progress: 100 },
+            { delay: 13200, text: '', prompt: false, progress: 100 },
+            { delay: 13400, text: '📋 SUMMARY:', color: '#60A5FA', prompt: true, bold: true, progress: 100 },
+            { delay: 13600, text: `   👤 Username: ${username}`, color: '#E0E7FF', prompt: false, progress: 100 },
+            { delay: 13800, text: `   📧 Email: ${email}`, color: '#E0E7FF', prompt: false, progress: 100 },
+            { delay: 14000, text: `   🏢 Department: ${department}`, color: '#E0E7FF', prompt: false, progress: 100 },
+            { delay: 14200, text: `   💼 Role: ${role}`, color: '#E0E7FF', prompt: false, progress: 100 },
+            { delay: 14400, text: '   ✅ Status: Active', color: '#10B981', prompt: false, progress: 100 },
+            { delay: 14600, text: '   🔐 MFA: Required on first login', color: '#E0E7FF', prompt: false, progress: 100 },
+            { delay: 14800, text: '', prompt: false, progress: 100 },
+            { delay: 15000, text: '⏱️  Execution time: 8.7 seconds', color: '#60A5FA', prompt: true, progress: 100 },
+            { delay: 15200, text: '💾 Data archived for compliance', color: '#60A5FA', prompt: true, progress: 100 },
+            { delay: 15400, text: `🎉 Welcome aboard, ${firstName}!`, color: '#10B981', prompt: true, bold: true, progress: 100 }
         ];
         
         // Execute provisioning steps
@@ -249,6 +404,12 @@ function initializeProvisioningDemo() {
             const step = steps[i];
             const prevDelay = i > 0 ? steps[i - 1].delay : 0;
             await new Promise(resolve => setTimeout(resolve, step.delay - prevDelay));
+            
+            // Update progress bar
+            if (progressBar && progressText) {
+                progressBar.style.width = `${step.progress}%`;
+                progressText.textContent = `${step.progress}%`;
+            }
             
             const line = document.createElement('div');
             line.className = 'console-line';
@@ -278,9 +439,10 @@ function initializeProvisioningDemo() {
         statusEl.className = 'demo-status';
         provisionBtn.disabled = false;
         executionTimeEl.textContent = `Executed in ${executionTime}s`;
+        progressContainer.classList.remove('active');
         
         // Show success notification
-        showNotification('User provisioned successfully!', 'success');
+        showToast('Success!', 'User provisioned successfully!', 'success');
     });
 }
 
@@ -302,7 +464,7 @@ function clearConsole() {
     const consoleEl = document.getElementById('console');
     consoleEl.innerHTML = `
         <div class="console-line console-ready">
-            <span class="console-prompt">$</span> IAM Automation System v2.0 Ready...
+            <span class="console-prompt">$</span> IAM Automation System v2.0 (Simulation) Ready...
         </div>
         <div class="console-line console-info">
             <span class="console-prompt">$</span> Waiting for user input...
@@ -313,6 +475,32 @@ function clearConsole() {
     if (executionTimeEl) {
         executionTimeEl.textContent = '';
     }
+    
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        progressContainer.classList.remove('active');
+    }
+    
+    showToast('Console cleared', 'Ready for new provisioning', 'info');
+}
+
+function exportConsoleLog() {
+    const consoleEl = document.getElementById('console');
+    const logText = consoleEl.innerText;
+    const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
+    const filename = `iam-console-log-${timestamp}.txt`;
+    
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('Export successful', `Log saved as ${filename}`, 'success');
 }
 
 function scrollToDemo() {
@@ -344,7 +532,7 @@ function showFeatureDetails(feature) {
             showAWSIntegration();
             break;
         default:
-            showNotification('Feature details coming soon!', 'info');
+            showToast('Coming soon', 'Feature details will be available soon!', 'info');
     }
 }
 
@@ -626,7 +814,7 @@ function createModal(title, content) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>${title}</h3>
-                    <button class="modal-close" onclick="closeModal()">✕</button>
+                    <button class="modal-close" onclick="closeModal()" aria-label="Close modal">✕</button>
                 </div>
                 <div class="modal-body">
                     ${content}
@@ -659,8 +847,7 @@ function showModal(modalHTML) {
         }
     });
     
-    // Close on ESC key
-    document.addEventListener('keydown', handleEscKey);
+    // Close on ESC key (handled by keyboard shortcuts)
 }
 
 function closeModal() {
@@ -669,76 +856,326 @@ function closeModal() {
         modal.classList.remove('active');
         setTimeout(() => {
             modal.remove();
-            document.removeEventListener('keydown', handleEscKey);
         }, 300);
     }
 }
 
-function handleEscKey(e) {
-    if (e.key === 'Escape') {
-        closeModal();
-    }
-}
-
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 2rem;
-        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#2563EB'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        z-index: 9999;
-        animation: slideInRight 0.3s ease-out;
-        max-width: 400px;
+// ========================================
+// Toast Notifications
+// ========================================
+function showToast(title, message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
+    const toastId = `toast-${Date.now()}`;
+    const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.id = toastId;
+    toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="closeToast('${toastId}')" aria-label="Close notification">✕</button>
     `;
-    notification.textContent = message;
     
-    document.body.appendChild(notification);
+    toastContainer.appendChild(toast);
     
-    // Remove after 5 seconds
+    // Auto-remove after 5 seconds
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
+        closeToast(toastId);
     }, 5000);
 }
 
-// Add notification animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+function closeToast(toastId) {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
     }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
+}
 
 // ========================================
-// Console Log
+// Performance & Analytics
 // ========================================
-console.log('%c🚀 IAM Automation Platform Loaded', 'color: #2563EB; font-size: 16px; font-weight: bold;');
+function trackPagePerformance() {
+    if ('performance' in window && 'PerformanceObserver' in window) {
+        // Track page load time
+        window.addEventListener('load', () => {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                const loadTime = perfData.loadEventEnd - perfData.fetchStart;
+                console.log(`Page load time: ${(loadTime / 1000).toFixed(2)}s`);
+            }
+        });
+    }
+}
+
+// Initialize performance tracking
+trackPagePerformance();
+
+// ========================================
+// Service Worker Registration (Optional)
+// ========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Uncomment to enable service worker
+        // navigator.serviceWorker.register('/sw.js')
+        //     .then(reg => console.log('Service Worker registered'))
+        //     .catch(err => console.log('Service Worker registration failed'));
+    });
+}
+
+// ========================================
+// Console Branding
+// ========================================
+console.log('%c🚀 IAM Automation Platform Loaded', 'color: #0066CC; font-size: 16px; font-weight: bold;');
 console.log('%cVersion 2.0 | Enhanced Edition', 'color: #6B7280; font-size: 12px;');
+console.log('%c\n💡 Keyboard Shortcuts:\n? - Show help\n/ - Focus search\nD - Jump to demo\nT - Toggle theme\nEsc - Close modals', 'color: #9CA3AF; font-size: 11px;');
+
+// ========================================
+// Error Handling
+// ========================================
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.error);
+    // Optionally show user-friendly error message
+    // showToast('Error', 'Something went wrong. Please refresh the page.', 'error');
+});
+
+// ========================================
+// Accessibility Enhancements
+// ========================================
+function initializeAccessibility() {
+    // Add skip to main content link
+    const skipLink = document.createElement('a');
+    skipLink.href = '#dashboard';
+    skipLink.className = 'skip-link';
+    skipLink.textContent = 'Skip to main content';
+    skipLink.style.cssText = `
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: var(--primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        z-index: 10000;
+    `;
+    skipLink.addEventListener('focus', () => {
+        skipLink.style.top = '0';
+    });
+    skipLink.addEventListener('blur', () => {
+        skipLink.style.top = '-40px';
+    });
+    document.body.insertBefore(skipLink, document.body.firstChild);
+    
+    // Announce dynamic content changes to screen readers
+    const announcer = document.createElement('div');
+    announcer.setAttribute('role', 'status');
+    announcer.setAttribute('aria-live', 'polite');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.className = 'sr-only';
+    announcer.style.cssText = `
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    `;
+    document.body.appendChild(announcer);
+    
+    // Store announcer for later use
+    window.a11yAnnouncer = announcer;
+}
+
+function announce(message) {
+    if (window.a11yAnnouncer) {
+        window.a11yAnnouncer.textContent = message;
+        setTimeout(() => {
+            window.a11yAnnouncer.textContent = '';
+        }, 1000);
+    }
+}
+
+// Initialize accessibility features
+initializeAccessibility();
+
+// ========================================
+// Utility Functions
+// ========================================
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// ========================================
+// Network Status Detection
+// ========================================
+window.addEventListener('online', () => {
+    showToast('Connection restored', 'You are back online', 'success');
+});
+
+window.addEventListener('offline', () => {
+    showToast('No connection', 'You are currently offline', 'warning');
+});
+
+// ========================================
+// Lazy Loading Images
+// ========================================
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(img);
+            }
+        });
+    });
+    
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+
+// ========================================
+// Copy to Clipboard Helper
+// ========================================
+function copyToClipboard(text, successMessage = 'Copied to clipboard') {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Success', successMessage, 'success');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showToast('Error', 'Failed to copy to clipboard', 'error');
+        });
+    } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast('Success', successMessage, 'success');
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            showToast('Error', 'Failed to copy to clipboard', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
+// ========================================
+// Enhanced Console Log Export
+// ========================================
+function formatConsoleLogForExport() {
+    const consoleEl = document.getElementById('console');
+    const lines = consoleEl.querySelectorAll('.console-line');
+    let output = '='.repeat(60) + '\n';
+    output += 'IAM AUTOMATION SYSTEM - CONSOLE LOG\n';
+    output += `Export Date: ${new Date().toLocaleString()}\n`;
+    output += '='.repeat(60) + '\n\n';
+    
+    lines.forEach(line => {
+        output += line.innerText + '\n';
+    });
+    
+    output += '\n' + '='.repeat(60) + '\n';
+    output += 'END OF LOG\n';
+    output += '='.repeat(60);
+    
+    return output;
+}
+
+// ========================================
+// Local Storage Helpers
+// ========================================
+function saveToLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+        return false;
+    }
+}
+
+function getFromLocalStorage(key, defaultValue = null) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+        console.error('Failed to get from localStorage:', e);
+        return defaultValue;
+    }
+}
+
+// ========================================
+// Export Functions to Global Scope
+// ========================================
+window.scrollToDemo = scrollToDemo;
+window.showFeatureDetails = showFeatureDetails;
+window.clearConsole = clearConsole;
+window.exportConsoleLog = exportConsoleLog;
+window.closeModal = closeModal;
+window.closeToast = closeToast;
+window.copyToClipboard = copyToClipboard;
+
+// ========================================
+// Development Helpers (Remove in Production)
+// ========================================
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('%c🛠️ Development Mode', 'color: #F59E0B; font-size: 14px; font-weight: bold;');
+    console.log('Available functions:', {
+        showToast,
+        showModal,
+        copyToClipboard,
+        clearConsole,
+        exportConsoleLog
+    });
+}
+
+// ========================================
+// Page Visibility API - Pause animations when tab is hidden
+// ========================================
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        console.log('Tab hidden - pausing animations');
+    } else {
+        console.log('Tab visible - resuming animations');
+    }
+});
