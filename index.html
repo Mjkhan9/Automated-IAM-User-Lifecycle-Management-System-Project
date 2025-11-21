@@ -11,6 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+        </svg>
+        <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+        </svg>
+    </button>
+
     <!-- Header -->
     <header class="header" id="header">
         <div class="header-container">
@@ -30,6 +40,15 @@
                     <span class="logo-subtitle">Enterprise Platform</span>
                 </div>
             </div>
+            
+            <!-- Search Bar -->
+            <div class="header-search">
+                <input type="text" id="searchInput" placeholder="Search features..." aria-label="Search">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+
             <nav class="nav">
                 <a href="#dashboard" class="nav-link active">Dashboard</a>
                 <a href="#features" class="nav-link">Features</a>
@@ -37,13 +56,24 @@
                 <a href="#tech" class="nav-link">Technology</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </nav>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </div>
     </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="#dashboard" class="mobile-menu-link">Dashboard</a>
+            <a href="#features" class="mobile-menu-link">Features</a>
+            <a href="#demo" class="mobile-menu-link">Live Demo</a>
+            <a href="#tech" class="mobile-menu-link">Technology</a>
+            <a href="#contact" class="mobile-menu-link">Contact</a>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero" id="dashboard">
@@ -291,6 +321,13 @@
                                 <option value="Executive">Executive</option>
                             </select>
                         </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="progress-container" id="progressContainer">
+                            <div class="progress-bar" id="progressBar"></div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary btn-full" id="provisionBtn">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M10 3v14m7-7H3"/>
@@ -308,6 +345,11 @@
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                     <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/>
                                     <path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                            </button>
+                            <button class="console-control" onclick="exportConsoleLog()" title="Export Log">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 12l-4-4h3V0h2v8h3l-4 4zm6.5-6h-2v2H14v6H2V8h1.5V6H1a1 1 0 00-1 1v7a1 1 0 001 1h14a1 1 0 001-1V7a1 1 0 00-1-1h-2.5z"/>
                                 </svg>
                             </button>
                         </div>
@@ -459,6 +501,38 @@
             <path d="M18 15l-6-6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="shortcuts-help" id="shortcutsHelp">
+        <div class="shortcuts-content">
+            <h4>Keyboard Shortcuts</h4>
+            <div class="shortcut-list">
+                <div class="shortcut-item">
+                    <kbd>?</kbd>
+                    <span>Show this help</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>/</kbd>
+                    <span>Focus search</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>D</kbd>
+                    <span>Jump to demo</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>T</kbd>
+                    <span>Toggle theme</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Esc</kbd>
+                    <span>Close modals</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="js/app.js"></script>
 </body>
