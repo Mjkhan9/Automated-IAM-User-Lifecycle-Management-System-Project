@@ -268,6 +268,20 @@ body {
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+    border: none;
+}
+
+.logo:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.logo:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .logo-icon {
@@ -1420,10 +1434,28 @@ body {
     transform: scale(1.05);
 }
 
+.tech-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 1rem 0 0.75rem;
+}
+
+.tech-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    color: var(--primary);
+}
+
 .tech-card p {
     color: var(--text-secondary);
     font-size: 0.9375rem;
     line-height: 1.6;
+    margin: 0;
 }
 
 /* ========================================
