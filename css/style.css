@@ -481,22 +481,28 @@ body {
 .hero-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, #0066CC 0%, #004C99 100%);
+    background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 50%, #FFFFFF 100%);
     opacity: 1;
 }
 
 [data-theme="dark"] .hero-gradient {
-    background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+    background: linear-gradient(135deg, #0066CC 0%, #004C99 100%);
 }
 
 .hero-pattern {
     position: absolute;
     inset: 0;
     background-image: 
-        radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%),
-        radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.05) 2%, transparent 0%);
+        radial-gradient(circle at 25px 25px, rgba(0, 0, 0, 0.03) 2%, transparent 0%),
+        radial-gradient(circle at 75px 75px, rgba(0, 0, 0, 0.03) 2%, transparent 0%);
     background-size: 100px 100px;
     animation: patternMove 20s linear infinite;
+}
+
+[data-theme="dark"] .hero-pattern {
+    background-image: 
+        radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%),
+        radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.05) 2%, transparent 0%);
 }
 
 @keyframes patternMove {
@@ -517,15 +523,22 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 102, 204, 0.1);
     backdrop-filter: blur(10px);
     padding: 0.5rem 1.25rem;
     border-radius: 50px;
-    color: white;
+    color: var(--text-primary);
     font-size: 0.875rem;
     font-weight: 600;
     margin-bottom: 2rem;
     animation: fadeInUp 0.6s ease-out;
+    border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+[data-theme="dark"] .hero-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .badge-icon {
@@ -535,13 +548,24 @@ body {
 .hero-title {
     font-size: 4rem;
     font-weight: 800;
-    color: white;
+    color: var(--text-primary);
     line-height: 1.1;
     margin-bottom: 1.5rem;
     animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
+[data-theme="dark"] .hero-title {
+    color: white;
+}
+
 .gradient-text {
+    background: linear-gradient(135deg, var(--primary) 0%, #5243AA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="dark"] .gradient-text {
     background: linear-gradient(to right, #FFFFFF, #A5B4FC);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -550,11 +574,15 @@ body {
 
 .hero-description {
     font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
     max-width: 800px;
     margin: 0 auto 2.5rem;
     line-height: 1.7;
     animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+[data-theme="dark"] .hero-description {
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .hero-actions {
@@ -574,9 +602,9 @@ body {
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 102, 204, 0.2);
     padding: 2rem;
     border-radius: var(--border-radius-lg);
     display: flex;
@@ -585,6 +613,12 @@ body {
     transition: all var(--transition-base);
     opacity: 0;
     transform: translateY(20px);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .stat-card {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .stat-card.animated {
@@ -593,6 +627,10 @@ body {
 
 .stat-card:hover {
     transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .stat-card:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
@@ -609,15 +647,23 @@ body {
 .stat-number {
     font-size: 2.5rem;
     font-weight: 800;
-    color: white;
+    color: var(--text-primary);
     line-height: 1;
     margin-bottom: 0.25rem;
 }
 
+[data-theme="dark"] .stat-number {
+    color: white;
+}
+
 .stat-label {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
     font-weight: 500;
+}
+
+[data-theme="dark"] .stat-label {
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Hero Eyebrow & Metrics */
@@ -633,22 +679,39 @@ body {
 .eyebrow-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 102, 204, 0.1);
     backdrop-filter: blur(10px);
     padding: 0.5rem 1.25rem;
     border-radius: 50px;
-    color: white;
+    color: var(--text-primary);
     font-size: 0.875rem;
     font-weight: 600;
+    border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+[data-theme="dark"] .eyebrow-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .eyebrow-divider {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     font-weight: 300;
 }
 
+[data-theme="dark"] .eyebrow-divider {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, #5243AA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="dark"] .text-gradient {
     background: linear-gradient(135deg, #FFFFFF 0%, #A5B4FC 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -659,10 +722,16 @@ body {
     position: absolute;
     inset: 0;
     background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
     background-size: 50px 50px;
     opacity: 0.5;
+}
+
+[data-theme="dark"] .hero-grid {
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
 .hero-glow {
@@ -686,15 +755,21 @@ body {
 }
 
 .metric-card {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 102, 204, 0.2);
     padding: 2rem;
     border-radius: var(--border-radius-lg);
     text-align: center;
     transition: all var(--transition-base);
     opacity: 0;
     transform: translateY(20px);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .metric-card {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .metric-card.animated {
@@ -703,6 +778,10 @@ body {
 
 .metric-card:hover {
     transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .metric-card:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
@@ -717,27 +796,43 @@ body {
 .metric-number {
     font-size: 2.5rem;
     font-weight: 800;
-    color: white;
+    color: var(--text-primary);
     line-height: 1;
+}
+
+[data-theme="dark"] .metric-number {
+    color: white;
 }
 
 .metric-suffix {
     font-size: 1.5rem;
     font-weight: 700;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .metric-suffix {
     color: white;
 }
 
 .metric-label {
     font-size: 1rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
+}
+
+[data-theme="dark"] .metric-label {
+    color: rgba(255, 255, 255, 0.95);
 }
 
 .metric-sublabel {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     font-weight: 400;
+}
+
+[data-theme="dark"] .metric-sublabel {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .scroll-indicator {
@@ -749,9 +844,13 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     font-size: 0.875rem;
     animation: bounce 2s infinite;
+}
+
+[data-theme="dark"] .scroll-indicator {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .scroll-indicator svg {
