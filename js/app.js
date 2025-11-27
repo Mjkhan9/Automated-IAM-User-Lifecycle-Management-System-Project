@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========================================
 function initializeTheme() {
     const themeToggle = document.getElementById('themeToggle');
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     
     document.documentElement.setAttribute('data-theme', savedTheme);
     
@@ -59,10 +59,27 @@ function initializeAnimations() {
             }
         });
     }, observerOptions);
+    
+    // Separate observer for tech cards with staggered animation
+    const techObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('animated');
+                }, index * 100);
+                techObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
     // Observe all animated elements
     document.querySelectorAll('[data-animate]').forEach(el => {
         observer.observe(el);
+    });
+    
+    // Also observe tech cards individually for fade-in animation
+    document.querySelectorAll('.tech-card').forEach(card => {
+        techObserver.observe(card);
     });
 }
 
@@ -335,7 +352,7 @@ function initializeProvisioningDemo() {
         const progressText = document.getElementById('progressText');
         
         statusEl.textContent = 'Processing';
-        statusEl.className = 'status-badge status-ready processing';
+        statusEl.className = 'demo-status processing';
         provisionBtn.disabled = true;
         progressContainer.classList.add('active');
         
@@ -436,7 +453,7 @@ function initializeProvisioningDemo() {
         const executionTime = ((endTime - startTime) / 1000).toFixed(1);
         
         statusEl.textContent = 'Complete';
-        statusEl.className = 'status-badge status-ready';
+        statusEl.className = 'demo-status';
         provisionBtn.disabled = false;
         executionTimeEl.textContent = `Executed in ${executionTime}s`;
         progressContainer.classList.remove('active');
@@ -464,12 +481,10 @@ function clearConsole() {
     const consoleEl = document.getElementById('console');
     consoleEl.innerHTML = `
         <div class="console-line console-ready">
-            <span class="console-prompt">→</span>
-            <span class="console-text text-accent">IAM Automation System v2.0</span>
+            <span class="console-prompt">$</span> IAM Automation System v2.0 (Simulation) Ready...
         </div>
         <div class="console-line console-info">
-            <span class="console-prompt">→</span>
-            <span class="console-text text-muted">Awaiting user input...</span>
+            <span class="console-prompt">$</span> Waiting for user input...
         </div>
     `;
     
