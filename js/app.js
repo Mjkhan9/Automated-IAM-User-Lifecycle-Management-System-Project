@@ -273,7 +273,7 @@ function initializeKeyboardShortcuts() {
 // Animated Counters
 // ========================================
 function initializeCounters() {
-    const counters = document.querySelectorAll('.stat-number[data-count]');
+    const counters = document.querySelectorAll('.metric-number[data-count]');
     
     const observerOptions = {
         threshold: 0.5
@@ -335,7 +335,7 @@ function initializeProvisioningDemo() {
         const progressText = document.getElementById('progressText');
         
         statusEl.textContent = 'Processing';
-        statusEl.className = 'demo-status processing';
+        statusEl.className = 'status-badge status-ready processing';
         provisionBtn.disabled = true;
         progressContainer.classList.add('active');
         
@@ -436,7 +436,7 @@ function initializeProvisioningDemo() {
         const executionTime = ((endTime - startTime) / 1000).toFixed(1);
         
         statusEl.textContent = 'Complete';
-        statusEl.className = 'demo-status';
+        statusEl.className = 'status-badge status-ready';
         provisionBtn.disabled = false;
         executionTimeEl.textContent = `Executed in ${executionTime}s`;
         progressContainer.classList.remove('active');
@@ -464,10 +464,12 @@ function clearConsole() {
     const consoleEl = document.getElementById('console');
     consoleEl.innerHTML = `
         <div class="console-line console-ready">
-            <span class="console-prompt">$</span> IAM Automation System v2.0 (Simulation) Ready...
+            <span class="console-prompt">→</span>
+            <span class="console-text text-accent">IAM Automation System v2.0</span>
         </div>
         <div class="console-line console-info">
-            <span class="console-prompt">$</span> Waiting for user input...
+            <span class="console-prompt">→</span>
+            <span class="console-text text-muted">Awaiting user input...</span>
         </div>
     `;
     
@@ -860,6 +862,13 @@ function closeModal() {
     }
 }
 
+function closeShortcutsHelp() {
+    const shortcutsHelp = document.getElementById('shortcutsHelp');
+    if (shortcutsHelp) {
+        shortcutsHelp.classList.remove('active');
+    }
+}
+
 // ========================================
 // Toast Notifications
 // ========================================
@@ -1154,6 +1163,7 @@ window.exportConsoleLog = exportConsoleLog;
 window.closeModal = closeModal;
 window.closeToast = closeToast;
 window.copyToClipboard = copyToClipboard;
+window.closeShortcutsHelp = closeShortcutsHelp;
 
 // ========================================
 // Development Helpers (Remove in Production)
