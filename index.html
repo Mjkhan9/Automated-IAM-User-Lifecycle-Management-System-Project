@@ -8,54 +8,66 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-theme="dark">
+    <!-- Ambient Background -->
+    <div class="ambient-bg" aria-hidden="true">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
     <!-- Theme Toggle Button -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-        <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
         </svg>
-        <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+        <svg class="theme-icon moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
     </button>
 
     <!-- Header -->
     <header class="header" id="header">
         <div class="header-container">
-            <div class="logo">
-                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" class="logo-icon">
-                    <rect width="44" height="44" rx="10" fill="url(#gradient1)"/>
-                    <path d="M13 22L19 28L31 15" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <defs>
-                        <linearGradient id="gradient1" x1="0" y1="0" x2="44" y2="44">
-                            <stop offset="0%" stop-color="#0066CC"/>
-                            <stop offset="100%" stop-color="#004C99"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <div class="logo-text">
-                    <h1>IAM Automation</h1>
-                    <span class="logo-subtitle">Enterprise Platform</span>
+            <a href="#" class="logo">
+                <div class="logo-mark">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+                        <path d="M9 16L13 20L23 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#14B8A6"/>
+                                <stop offset="100%" stop-color="#0D9488"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
                 </div>
-            </div>
-            
-            <!-- Search Bar -->
-            <div class="header-search">
-                <input type="text" id="searchInput" placeholder="Search features..." aria-label="Search">
-                <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
-                </svg>
-            </div>
+                <div class="logo-text">
+                    <span class="logo-title">IAM Platform</span>
+                    <span class="logo-subtitle">Enterprise Automation</span>
+                </div>
+            </a>
 
-            <nav class="nav">
-                <a href="#dashboard" class="nav-link active">Dashboard</a>
-                <a href="#features" class="nav-link">Features</a>
+            <nav class="nav" id="mainNav">
+                <a href="#dashboard" class="nav-link active">Overview</a>
+                <a href="#features" class="nav-link">Capabilities</a>
                 <a href="#demo" class="nav-link">Live Demo</a>
-                <a href="#tech" class="nav-link">Technology</a>
+                <a href="#tech" class="nav-link">Stack</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </nav>
+
+            <div class="header-actions">
+                <a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project" target="_blank" class="btn btn-ghost btn-sm">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span>GitHub</span>
+                </a>
+            </div>
+
             <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
                 <span></span>
                 <span></span>
@@ -66,467 +78,545 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-content">
-            <a href="#dashboard" class="mobile-menu-link">Dashboard</a>
-            <a href="#features" class="mobile-menu-link">Features</a>
+        <nav class="mobile-menu-content">
+            <a href="#dashboard" class="mobile-menu-link">Overview</a>
+            <a href="#features" class="mobile-menu-link">Capabilities</a>
             <a href="#demo" class="mobile-menu-link">Live Demo</a>
-            <a href="#tech" class="mobile-menu-link">Technology</a>
+            <a href="#tech" class="mobile-menu-link">Stack</a>
             <a href="#contact" class="mobile-menu-link">Contact</a>
-        </div>
+            <a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project" target="_blank" class="mobile-menu-link">GitHub →</a>
+        </nav>
     </div>
 
     <!-- Hero Section -->
     <section class="hero" id="dashboard">
-        <div class="hero-background">
-            <div class="hero-gradient"></div>
-            <div class="hero-pattern"></div>
-        </div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-glow" aria-hidden="true"></div>
+        
         <div class="hero-content">
-            <div class="hero-badge">
-                <span class="badge-icon">🚀</span>
-                <span>AWS Solutions Architect Certified</span>
+            <div class="hero-eyebrow" data-animate="fade-up">
+                <span class="eyebrow-badge">AWS Certified</span>
+                <span class="eyebrow-divider">•</span>
+                <span>Solutions Architect</span>
             </div>
-            <h2 class="hero-title">
-                Enterprise Identity & Access<br>
-                <span class="gradient-text">Management Platform</span>
-            </h2>
-            <p class="hero-description">
-                Simulated identity lifecycle console that demonstrates how user provisioning, de-provisioning, 
-                and compliance monitoring can be automated across Active Directory and AWS with audit-ready logging.
+
+            <h1 class="hero-title" data-animate="fade-up" data-delay="100">
+                Identity & Access<br>
+                <span class="text-gradient">Management Platform</span>
+            </h1>
+
+            <p class="hero-description" data-animate="fade-up" data-delay="200">
+                A simulated enterprise IAM console demonstrating automated user provisioning, 
+                de-provisioning, and compliance monitoring across Active Directory and AWS—with 
+                complete audit logging for security investigations.
             </p>
-            <div class="hero-actions">
+
+            <div class="hero-actions" data-animate="fade-up" data-delay="300">
                 <a href="#demo" class="btn btn-primary">
                     <span>Try Live Demo</span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 5L15 10L10 15M15 10H5"/>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 8h10M9 4l4 4-4 4"/>
                     </svg>
                 </a>
                 <a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project" target="_blank" class="btn btn-secondary">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                     </svg>
-                    <span>View GitHub</span>
+                    <span>Source Code</span>
                 </a>
             </div>
-            
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card" data-animate="fade-up" data-delay="100">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="8000">0</div>
-                        <div class="stat-label">Users Supported (Real World)</div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid" data-animate="fade-up" data-delay="400">
+                <div class="metric-card">
+                    <div class="metric-value">
+                        <span class="metric-number" data-count="8000">0</span>
                     </div>
+                    <div class="metric-label">Users Supported</div>
+                    <div class="metric-sublabel">Real-world capacity</div>
                 </div>
-                <div class="stat-card" data-animate="fade-up" data-delay="200">
-                    <div class="stat-icon">⚡</div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="40">0</div>
-                        <div class="stat-label">% Time Savings (Automation)</div>
+                <div class="metric-card">
+                    <div class="metric-value">
+                        <span class="metric-number" data-count="40">0</span>
+                        <span class="metric-suffix">%</span>
                     </div>
+                    <div class="metric-label">Time Savings</div>
+                    <div class="metric-sublabel">Via automation</div>
                 </div>
-                <div class="stat-card" data-animate="fade-up" data-delay="300">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="100">0</div>
-                        <div class="stat-label">% Policy Coverage</div>
+                <div class="metric-card">
+                    <div class="metric-value">
+                        <span class="metric-number" data-count="100">0</span>
+                        <span class="metric-suffix">%</span>
                     </div>
+                    <div class="metric-label">Policy Coverage</div>
+                    <div class="metric-sublabel">Full compliance</div>
                 </div>
-                <div class="stat-card" data-animate="fade-up" data-delay="400">
-                    <div class="stat-icon">🔒</div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="0">0</div>
-                        <div class="stat-label">Critical Security Incidents</div>
+                <div class="metric-card">
+                    <div class="metric-value">
+                        <span class="metric-number" data-count="0">0</span>
                     </div>
+                    <div class="metric-label">Security Incidents</div>
+                    <div class="metric-sublabel">Critical breaches</div>
                 </div>
             </div>
+        </div>
+
+        <div class="scroll-indicator" aria-hidden="true">
+            <span>Scroll to explore</span>
+            <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="1" y="1" width="14" height="22" rx="7"/>
+                <circle cx="8" cy="8" r="2" fill="currentColor" class="scroll-dot"/>
+            </svg>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features-section" id="features">
+    <section class="section features-section" id="features">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge">Platform Capabilities</span>
-                <h3 class="section-title">Comprehensive IAM Automation</h3>
+            <header class="section-header" data-animate="fade-up">
+                <span class="section-eyebrow">Platform Capabilities</span>
+                <h2 class="section-title">Enterprise-Grade IAM Automation</h2>
                 <p class="section-description">
-                    Portfolio IAM console and scripts designed to illustrate how identity lifecycle management 
-                    can be streamlined while still enforcing strong security and compliance.
+                    A portfolio showcase of identity lifecycle patterns—from onboarding through offboarding—designed 
+                    for security-first enterprises.
                 </p>
-            </div>
+            </header>
 
             <div class="features-grid">
-                <div class="feature-card" data-animate="fade-up" data-delay="100">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h4>Automated Provisioning</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="0">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
                     </div>
-                    <p>Create users across AD and AWS IAM with role-based policies in seconds. Simulated group assignments, credential generation, and secure storage patterns mirror real-world workflows.</p>
-                    <ul class="feature-list">
-                        <li>⚡ Role-based access control (RBAC)</li>
-                        <li>🔑 Automated credential management concepts</li>
-                        <li>📦 Encrypted S3 credential storage design</li>
-                    </ul>
-                    <button class="feature-btn" onclick="scrollToDemo()">Try Demo →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>Automated Provisioning</h3>
+                        <p>Create users across AD and AWS IAM with role-based policies. Simulates group assignment, credential generation, and encrypted storage.</p>
+                        <ul class="feature-list">
+                            <li>Role-based access control</li>
+                            <li>Automated credential management</li>
+                            <li>Encrypted S3 storage</li>
+                        </ul>
+                    </div>
+                    <button class="feature-action" onclick="scrollToDemo()">
+                        <span>Try Demo</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </article>
 
-                <div class="feature-card" data-animate="fade-up" data-delay="200">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h4>De-provisioning Workflow</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="100">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
                     </div>
-                    <p>Showcases how offboarding flows can disable accounts, revoke access, and archive data for compliance when employees leave or change roles.</p>
-                    <ul class="feature-list">
-                        <li>🗑️ Automated account deactivation patterns</li>
-                        <li>🔐 Access revocation workflows</li>
-                        <li>💾 Compliance data archiving examples</li>
-                    </ul>
-                    <button class="feature-btn" onclick="showFeatureDetails('deprovision')">Learn More →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>De-provisioning Workflow</h3>
+                        <p>Demonstrates secure offboarding: disabling accounts, revoking access, and archiving data for compliance requirements.</p>
+                        <ul class="feature-list">
+                            <li>Automated account deactivation</li>
+                            <li>Access revocation chains</li>
+                            <li>Compliance data archival</li>
+                        </ul>
+                    </div>
+                    <button class="feature-action" onclick="showFeatureDetails('deprovision')">
+                        <span>Learn More</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </article>
 
-                <div class="feature-card" data-animate="fade-up" data-delay="300">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h4>Compliance Dashboard</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="200">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
                     </div>
-                    <p>Conceptual view of dormant accounts, access certifications, and policy compliance with the kind of alerts real IAM teams rely on.</p>
-                    <ul class="feature-list">
-                        <li>📊 Compliance monitoring concepts</li>
-                        <li>⏰ Dormant account detection logic</li>
-                        <li>🔔 Automated compliance alerting patterns</li>
-                    </ul>
-                    <button class="feature-btn" onclick="showFeatureDetails('compliance')">View Dashboard →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>Compliance Dashboard</h3>
+                        <p>Monitor dormant accounts, pending access certifications, and policy violations—the alerts real IAM teams rely on.</p>
+                        <ul class="feature-list">
+                            <li>Real-time compliance scoring</li>
+                            <li>Dormant account detection</li>
+                            <li>Automated alert systems</li>
+                        </ul>
+                    </div>
+                    <button class="feature-action" onclick="showFeatureDetails('compliance')">
+                        <span>View Dashboard</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </article>
 
-                <div class="feature-card" data-animate="fade-up" data-delay="400">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h4>Audit Logging</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="300">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                     </div>
-                    <p>End-to-end audit trail design with long-term retention, aligned to how enterprises keep identity events searchable for investigations.</p>
-                    <ul class="feature-list">
-                        <li>📝 Comprehensive audit trail model</li>
-                        <li>🔒 Long-term encrypted retention plan</li>
-                        <li>🔍 CloudTrail-style event logging</li>
-                    </ul>
-                    <button class="feature-btn" onclick="showFeatureDetails('audit')">View Logs →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>Audit Logging</h3>
+                        <p>Complete audit trail design with long-term retention, aligned to enterprise forensic and compliance needs.</p>
+                        <ul class="feature-list">
+                            <li>Immutable event logs</li>
+                            <li>7-year encrypted retention</li>
+                            <li>CloudTrail integration</li>
+                        </ul>
+                    </div>
+                    <button class="feature-action" onclick="showFeatureDetails('audit')">
+                        <span>View Logs</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </article>
 
-                <div class="feature-card" data-animate="fade-up" data-delay="500">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h4>PowerShell Automation</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="400">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
                     </div>
-                    <p>Bulk AD operations, group management, and dormant account checks are demonstrated through example PowerShell scripts in the repository.</p>
-                    <ul class="feature-list">
-                        <li>⚙️ Bulk AD operations</li>
-                        <li>👥 Group and role management</li>
-                        <li>🔍 Dormant account detection scripts</li>
-                    </ul>
-                    <button class="feature-btn" onclick="window.open('https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project/tree/main/scripts', '_blank')">View Scripts →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>PowerShell Automation</h3>
+                        <p>Bulk AD operations, group management, and dormant account checks demonstrated through production-ready scripts.</p>
+                        <ul class="feature-list">
+                            <li>Bulk AD operations</li>
+                            <li>Group & role management</li>
+                            <li>Scheduled maintenance tasks</li>
+                        </ul>
+                    </div>
+                    <a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project/tree/main/scripts" target="_blank" class="feature-action">
+                        <span>View Scripts</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </a>
+                </article>
 
-                <div class="feature-card" data-animate="fade-up" data-delay="600">
-                    <div class="feature-header">
-                        <div class="feature-icon-wrapper">
-                            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h4>AWS Integration</h4>
+                <article class="feature-card" data-animate="fade-up" data-delay="500">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                        </svg>
                     </div>
-                    <p>Demonstrates how IAM, S3, SNS, and CloudTrail would fit into a real automation flow, with sample Python code as a reference.</p>
-                    <ul class="feature-list">
-                        <li>☁️ AWS IAM provisioning patterns</li>
-                        <li>📬 SNS notification concepts</li>
-                        <li>🔐 IAM policy automation examples</li>
-                    </ul>
-                    <button class="feature-btn" onclick="showFeatureDetails('aws')">Integration Details →</button>
-                </div>
+                    <div class="feature-content">
+                        <h3>AWS Integration</h3>
+                        <p>IAM, S3, SNS, and CloudTrail integration patterns with Python boto3 reference implementations.</p>
+                        <ul class="feature-list">
+                            <li>IAM provisioning patterns</li>
+                            <li>SNS notification pipelines</li>
+                            <li>Policy automation examples</li>
+                        </ul>
+                    </div>
+                    <button class="feature-action" onclick="showFeatureDetails('aws')">
+                        <span>Integration Details</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- Live Demo Section -->
-    <section class="demo-section" id="demo">
+    <!-- Demo Section -->
+    <section class="section demo-section" id="demo">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge">Interactive Experience</span>
-                <h3 class="section-title">Live User Provisioning Demo</h3>
+            <header class="section-header" data-animate="fade-up">
+                <span class="section-eyebrow">Interactive Experience</span>
+                <h2 class="section-title">Live Provisioning Simulation</h2>
                 <p class="section-description">
-                    Walk through a simulated IAM run. The console mirrors the steps a real automation pipeline would take:
-                    validating input, assigning roles, provisioning accounts, and recording an audit trail.
+                    Walk through a simulated IAM workflow—validating input, assigning roles, provisioning accounts, 
+                    and recording an audit trail in real time.
                 </p>
-            </div>
+            </header>
 
-            <div class="demo-container">
-                <div class="demo-input">
-                    <div class="demo-header">
-                        <h4>User Information</h4>
-                        <span class="demo-status" id="demoStatus">Ready</span>
+            <div class="demo-layout" data-animate="fade-up" data-delay="100">
+                <div class="demo-form-panel">
+                    <div class="panel-header">
+                        <h3>User Information</h3>
+                        <span class="status-badge status-ready" id="demoStatus">Ready</span>
                     </div>
-                    <form id="provisionForm">
-                        <div class="form-group">
-                            <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" placeholder="John" required>
+                    
+                    <form id="provisionForm" class="demo-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" placeholder="John" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" placeholder="Doe" required>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name</label>
-                            <input type="text" id="lastName" placeholder="Doe" required>
-                        </div>
+                        
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <input type="email" id="email" placeholder="john.doe@company.com" required>
                         </div>
-                        <div class="form-group">
-                            <label for="department">Department</label>
-                            <select id="department" required>
-                                <option value="">Select Department</option>
-                                <option value="IT">Information Technology</option>
-                                <option value="Finance">Finance & Accounting</option>
-                                <option value="HR">Human Resources</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Engineering">Engineering</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="role">Role</label>
-                            <select id="role" required>
-                                <option value="">Select Role</option>
-                                <option value="Developer">Developer</option>
-                                <option value="Analyst">Analyst</option>
-                                <option value="Admin">Administrator</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Executive">Executive</option>
-                            </select>
-                        </div>
                         
-                        <!-- Progress Bar -->
-                        <div class="progress-container" id="progressContainer">
-                            <div class="progress-bar" id="progressBar"></div>
-                            <div class="progress-text" id="progressText">0%</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <select id="department" required>
+                                    <option value="">Select...</option>
+                                    <option value="IT">Information Technology</option>
+                                    <option value="Finance">Finance & Accounting</option>
+                                    <option value="HR">Human Resources</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Engineering">Engineering</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="role">Role</label>
+                                <select id="role" required>
+                                    <option value="">Select...</option>
+                                    <option value="Developer">Developer</option>
+                                    <option value="Analyst">Analyst</option>
+                                    <option value="Admin">Administrator</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Executive">Executive</option>
+                                </select>
+                            </div>
                         </div>
-                        
+
+                        <div class="progress-wrapper" id="progressContainer">
+                            <div class="progress-track">
+                                <div class="progress-fill" id="progressBar"></div>
+                            </div>
+                            <span class="progress-label" id="progressText">0%</span>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-full" id="provisionBtn">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 3v14m7-7H3"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="8.5" cy="7" r="4"/>
+                                <path d="M20 8v6M23 11h-6"/>
                             </svg>
                             <span>Provision User</span>
                         </button>
                     </form>
                 </div>
-                
-                <div class="demo-output">
-                    <div class="demo-header">
-                        <h4>Automation Console</h4>
-                        <div class="console-controls">
-                            <button class="console-control" onclick="clearConsole()" title="Clear Console">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/>
-                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+
+                <div class="demo-console-panel">
+                    <div class="panel-header">
+                        <h3>Automation Console</h3>
+                        <div class="console-actions">
+                            <button class="icon-btn" onclick="clearConsole()" title="Clear">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                                 </svg>
                             </button>
-                            <button class="console-control" onclick="exportConsoleLog()" title="Export Log">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M8 12l-4-4h3V0h2v8h3l-4 4zm6.5-6h-2v2H14v6H2V8h1.5V6H1a1 1 0 00-1 1v7a1 1 0 001 1h14a1 1 0 001-1V7a1 1 0 00-1-1h-2.5z"/>
+                            <button class="icon-btn" onclick="exportConsoleLog()" title="Export">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
+                    
                     <div class="console" id="console">
-                        <div class="console-line console-ready">
-                            <span class="console-prompt">$</span> IAM Automation System v2.0 (Simulation) Ready...
+                        <div class="console-line">
+                            <span class="console-prompt">→</span>
+                            <span class="console-text text-accent">IAM Automation System v2.0</span>
                         </div>
-                        <div class="console-line console-info">
-                            <span class="console-prompt">$</span> Waiting for user input...
+                        <div class="console-line">
+                            <span class="console-prompt">→</span>
+                            <span class="console-text text-muted">Awaiting user input...</span>
                         </div>
                     </div>
+                    
                     <div class="console-footer">
-                        <span class="console-info-text">Simulated AWS IAM workflow (backed by sample scripts in /scripts)</span>
-                        <span class="console-info-text" id="executionTime"></span>
+                        <span class="console-meta">Simulation Mode</span>
+                        <span class="console-meta" id="executionTime"></span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Technology Stack -->
-    <section class="tech-section" id="tech">
+    <!-- Tech Stack Section -->
+    <section class="section tech-section" id="tech">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge">Technology Stack</span>
-                <h3 class="section-title">Built with Industry-Leading Tools</h3>
+            <header class="section-header" data-animate="fade-up">
+                <span class="section-eyebrow">Technology Stack</span>
+                <h2 class="section-title">Built with Modern Tools</h2>
                 <p class="section-description">
-                    Combining scripting, cloud services, and directory services to model an enterprise IAM automation platform.
+                    Combining scripting, cloud services, and directory services to model enterprise IAM automation.
                 </p>
-            </div>
+            </header>
 
-            <div class="tech-grid">
-                <div class="tech-card" data-animate="fade-up" data-delay="100">
-                    <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-                    <p>Core automation examples and AWS SDK (boto3) integration concepts.</p>
+            <div class="tech-grid" data-animate="fade-up" data-delay="100">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/>
+                        </svg>
+                    </div>
+                    <h4>Python</h4>
+                    <p>Core automation scripts with boto3 for AWS SDK integration</p>
                 </div>
-                <div class="tech-card" data-animate="fade-up" data-delay="200">
-                    <img src="https://img.shields.io/badge/PowerShell-5391FE?style=for-the-badge&logo=powershell&logoColor=white" alt="PowerShell">
-                    <p>Active Directory provisioning, group management, and bulk operations.</p>
+
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M23.181 2.974c.568 0 .923.463.792 1.035l-3.659 15.982c-.13.572-.697 1.035-1.265 1.035H4.95c-.568 0-.923-.463-.792-1.035L7.817 4.009c.13-.572.697-1.035 1.265-1.035h14.099zM9.412 5.727L6.953 16.545h2.541l2.458-10.818H9.412zm6.358 0l-2.458 10.818h2.541l2.458-10.818h-2.541z"/>
+                        </svg>
+                    </div>
+                    <h4>PowerShell</h4>
+                    <p>Active Directory provisioning, group management, and bulk operations</p>
                 </div>
-                <div class="tech-card" data-animate="fade-up" data-delay="300">
-                    <img src="https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS">
-                    <p>IAM, S3, SNS, and CloudTrail integration patterns for identity workflows.</p>
+
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576.04.063.056.127.056.183 0 .08-.048.16-.152.24l-.503.335a.383.383 0 0 1-.208.072c-.08 0-.16-.04-.239-.112a2.47 2.47 0 0 1-.287-.375 6.18 6.18 0 0 1-.248-.471c-.622.734-1.405 1.101-2.347 1.101-.67 0-1.205-.191-1.596-.574-.391-.384-.59-.894-.59-1.533 0-.678.239-1.23.726-1.644.487-.415 1.133-.623 1.955-.623.272 0 .551.024.846.064.296.04.6.104.918.176v-.583c0-.607-.127-1.03-.375-1.277-.255-.248-.686-.367-1.3-.367-.28 0-.568.031-.863.103-.295.072-.583.16-.862.272a2.287 2.287 0 0 1-.28.104.488.488 0 0 1-.127.023c-.112 0-.168-.08-.168-.247v-.391c0-.128.016-.224.056-.28a.597.597 0 0 1 .224-.167c.279-.144.614-.264 1.005-.36a4.84 4.84 0 0 1 1.246-.151c.95 0 1.644.216 2.091.647.439.43.662 1.085.662 1.963v2.586zm-3.24 1.214c.263 0 .534-.048.822-.144.287-.096.543-.271.758-.51.128-.152.224-.32.272-.512.047-.191.08-.423.08-.694v-.335a6.66 6.66 0 0 0-.735-.136 6.02 6.02 0 0 0-.75-.048c-.535 0-.926.104-1.19.32-.263.215-.39.518-.39.917 0 .375.095.655.295.846.191.2.47.296.838.296zm6.41.862c-.144 0-.24-.024-.304-.08-.064-.048-.12-.16-.168-.311L7.586 5.55a1.398 1.398 0 0 1-.072-.32c0-.128.064-.2.191-.2h.783c.151 0 .255.025.31.08.065.048.113.16.16.312l1.342 5.284 1.245-5.284c.04-.16.088-.264.151-.312a.549.549 0 0 1 .32-.08h.638c.152 0 .256.025.32.08.063.048.12.16.151.312l1.261 5.348 1.381-5.348c.048-.16.104-.264.16-.312a.52.52 0 0 1 .311-.08h.743c.127 0 .2.065.2.2 0 .04-.009.08-.017.128a1.137 1.137 0 0 1-.056.2l-1.923 6.17c-.048.16-.104.263-.168.311a.51.51 0 0 1-.303.08h-.687c-.151 0-.255-.024-.32-.08-.063-.056-.119-.16-.15-.32l-1.238-5.148-1.23 5.14c-.04.16-.087.264-.15.32-.065.056-.177.08-.32.08zm10.256.215c-.415 0-.83-.048-1.229-.143-.399-.096-.71-.2-.918-.32-.128-.071-.215-.151-.247-.223a.563.563 0 0 1-.048-.224v-.407c0-.167.064-.247.183-.247.048 0 .096.008.144.024.048.016.12.048.2.08.271.12.566.215.878.279.319.064.63.096.95.096.502 0 .894-.088 1.165-.264a.86.86 0 0 0 .415-.758.777.777 0 0 0-.215-.559c-.144-.151-.416-.287-.807-.415l-1.157-.36c-.583-.183-1.014-.454-1.277-.813a1.902 1.902 0 0 1-.4-1.158c0-.335.073-.63.216-.886.144-.255.335-.479.575-.654.24-.184.51-.32.83-.415.32-.096.655-.136 1.006-.136.175 0 .359.008.535.032.183.024.35.056.518.088.16.04.312.08.455.127.144.048.256.096.336.144a.69.69 0 0 1 .24.2.43.43 0 0 1 .071.263v.375c0 .168-.064.256-.184.256a.83.83 0 0 1-.303-.096 3.652 3.652 0 0 0-1.532-.311c-.455 0-.815.071-1.062.223-.248.152-.375.383-.375.71 0 .224.08.416.24.567.159.152.454.304.877.44l1.134.358c.574.184.99.44 1.237.767.247.327.367.702.367 1.117 0 .343-.072.655-.207.926-.144.272-.336.511-.583.703-.248.2-.543.343-.886.447-.36.111-.734.167-1.142.167z"/>
+                        </svg>
+                    </div>
+                    <h4>AWS</h4>
+                    <p>IAM, S3, SNS, and CloudTrail for complete identity workflows</p>
                 </div>
-                <div class="tech-card" data-animate="fade-up" data-delay="400">
-                    <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
-                    <p>Planned RESTful API and backend layer for extending the demo into a full service.</p>
+
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M7.172 20.36c-.904-.56-1.08-1.22-.856-2.104l1.836-7.392-2.244-1.4c-.72-.452-.964-1.16-.608-1.84l1.556-2.94c.336-.64 1.072-.84 1.724-.512l2.348 1.244 2.348-1.244c.652-.328 1.388-.128 1.724.512l1.556 2.94c.356.68.112 1.388-.608 1.84l-2.244 1.4 1.836 7.392c.224.884.048 1.544-.856 2.104L12 22.8l-4.828-2.44z"/>
+                        </svg>
+                    </div>
+                    <h4>Active Directory</h4>
+                    <p>Enterprise directory and identity source integration patterns</p>
                 </div>
-                <div class="tech-card" data-animate="fade-up" data-delay="500">
-                    <img src="https://img.shields.io/badge/Active_Directory-0078D4?style=for-the-badge&logo=microsoft&logoColor=white" alt="Active Directory">
-                    <p>Enterprise directory and identity source integration (conceptual).</p>
+
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <h4>CloudTrail</h4>
+                    <p>Audit logging, retention, and compliance monitoring architecture</p>
                 </div>
-                <div class="tech-card" data-animate="fade-up" data-delay="600">
-                    <img src="https://img.shields.io/badge/CloudTrail-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="CloudTrail">
-                    <p>Model for audit logging, retention, and compliance monitoring of IAM events.</p>
+
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                            <path d="M11.146 0h3.924v18.166c-2.013.382-3.491.535-5.096.535-4.791 0-7.288-2.166-7.288-6.32 0-4.002 2.65-6.6 6.753-6.6.637 0 1.121.05 1.707.203V0zm0 9.143a3.894 3.894 0 0 0-1.325-.204c-1.988 0-3.134 1.223-3.134 3.365 0 2.09 1.096 3.236 3.109 3.236.433 0 .79-.025 1.35-.102V9.142zM21.314 6.06v9.098c0 3.134-.229 4.638-.917 5.937-.637 1.249-1.478 2.039-3.211 2.905l-3.644-1.733c1.733-.815 2.574-1.53 3.109-2.625.561-1.121.739-2.421.739-5.835V6.059h3.924z"/>
+                        </svg>
+                    </div>
+                    <h4>JavaScript</h4>
+                    <p>Interactive frontend with live simulation and real-time console</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact/Footer Section -->
+    <!-- Footer -->
     <footer class="footer" id="contact">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-main">
-                    <div class="footer-brand">
-                        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" class="footer-logo">
-                            <rect width="44" height="44" rx="10" fill="url(#gradient2)"/>
-                            <path d="M13 22L19 28L31 15" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <defs>
-                                <linearGradient id="gradient2" x1="0" y1="0" x2="44" y2="44">
-                                    <stop offset="0%" stop-color="#0066CC"/>
-                                    <stop offset="100%" stop-color="#004C99"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                        <div>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="brand-info">
+                        <div class="brand-avatar">MK</div>
+                        <div class="brand-details">
                             <h4>Mohammad Jawad Khan</h4>
-                            <p class="footer-title">AWS Solutions Architect | IAM Specialist</p>
-                            <p class="footer-subtitle">IT Operations Engineer</p>
+                            <p>AWS Solutions Architect | IAM Specialist</p>
                         </div>
                     </div>
-                    <p class="footer-description">
-                        Designing and implementing enterprise-grade identity management solutions 
-                        with hands-on experience in AWS cloud, Service Desk operations, Active Directory, and automation scripting.
+                    <p class="brand-bio">
+                        Building enterprise-grade identity management solutions with hands-on experience 
+                        in AWS, Active Directory, and automation scripting.
                     </p>
-                    <div class="footer-badges">
-                        <span class="footer-badge">📍 Houston, TX</span>
-                        <span class="footer-badge">✅ AWS Certified</span>
-                        <span class="footer-badge">🎓 University of Houston</span>
+                    <div class="brand-tags">
+                        <span class="tag">📍 Houston, TX</span>
+                        <span class="tag">🎓 University of Houston</span>
+                        <span class="tag">✓ AWS Certified</span>
                     </div>
                 </div>
 
-                <div class="footer-links-section">
-                    <div class="footer-column">
-                        <h5>Quick Links</h5>
-                        <ul>
-                            <li><a href="#dashboard">Dashboard</a></li>
-                            <li><a href="#features">Features</a></li>
-                            <li><a href="#demo">Live Demo</a></li>
-                            <li><a href="#tech">Technology</a></li>
-                        </ul>
+                <nav class="footer-nav">
+                    <div class="footer-col">
+                        <h5>Navigation</h5>
+                        <a href="#dashboard">Overview</a>
+                        <a href="#features">Capabilities</a>
+                        <a href="#demo">Live Demo</a>
+                        <a href="#tech">Tech Stack</a>
                     </div>
-                    <div class="footer-column">
+                    <div class="footer-col">
                         <h5>Projects</h5>
-                        <ul>
-                            <li><a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project" target="_blank">IAM Automation</a></li>
-                            <li><a href="https://github.com/Mjkhan9" target="_blank">GitHub Portfolio</a></li>
-                            <li><a href="https://linkedin.com/in/mjkhan1" target="_blank">LinkedIn Profile</a></li>
-                        </ul>
+                        <a href="https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project" target="_blank">IAM Platform</a>
+                        <a href="https://github.com/Mjkhan9" target="_blank">GitHub Profile</a>
                     </div>
-                    <div class="footer-column">
+                    <div class="footer-col">
                         <h5>Connect</h5>
                         <div class="social-links">
                             <a href="https://linkedin.com/in/mjkhan1" target="_blank" class="social-link" title="LinkedIn">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                                 </svg>
                             </a>
                             <a href="https://github.com/Mjkhan9" target="_blank" class="social-link" title="GitHub">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                                 </svg>
                             </a>
                             <a href="mailto:mjkhan9@cougarnet.uh.edu" class="social-link" title="Email">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
                                 </svg>
                             </a>
                         </div>
                     </div>
-                </div>
+                </nav>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 Mohammad Jawad Khan. All rights reserved.</p>
-                <p class="footer-note">
-                    Portfolio demonstration project for IAM lifecycle automation concepts.
-                </p>
+                <p>© 2024 Mohammad Jawad Khan. Portfolio demonstration project.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Scroll to Top Button -->
-    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M18 15l-6-6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Scroll to Top -->
+    <button class="scroll-top-btn" id="scrollTop" aria-label="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
         </svg>
     </button>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Keyboard Shortcuts Help -->
-    <div class="shortcuts-help" id="shortcutsHelp">
-        <div class="shortcuts-content">
-            <h4>Keyboard Shortcuts</h4>
-            <div class="shortcut-list">
-                <div class="shortcut-item">
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal-backdrop" id="shortcutsHelp">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Keyboard Shortcuts</h4>
+                <button class="modal-close" onclick="closeShortcutsHelp()">×</button>
+            </div>
+            <div class="shortcuts-list">
+                <div class="shortcut-row">
                     <kbd>?</kbd>
-                    <span>Show this help</span>
+                    <span>Show shortcuts</span>
                 </div>
-                <div class="shortcut-item">
+                <div class="shortcut-row">
                     <kbd>/</kbd>
                     <span>Focus search</span>
                 </div>
-                <div class="shortcut-item">
+                <div class="shortcut-row">
                     <kbd>D</kbd>
                     <span>Jump to demo</span>
                 </div>
-                <div class="shortcut-item">
+                <div class="shortcut-row">
                     <kbd>T</kbd>
                     <span>Toggle theme</span>
                 </div>
-                <div class="shortcut-item">
+                <div class="shortcut-row">
                     <kbd>Esc</kbd>
                     <span>Close modals</span>
                 </div>
