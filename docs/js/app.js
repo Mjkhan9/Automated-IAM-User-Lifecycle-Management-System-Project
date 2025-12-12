@@ -325,6 +325,17 @@ function initializeCounters() {
 }
 
 // ========================================
+// Demo Animation Controller
+// ========================================
+let demoAnimationController = null;
+
+function skipDemoAnimation() {
+    if (demoAnimationController) {
+        demoAnimationController.cancelled = true;
+    }
+}
+
+// ========================================
 // User Provisioning Demo
 // ========================================
 function initializeProvisioningDemo() {
@@ -356,12 +367,19 @@ function initializeProvisioningDemo() {
         provisionBtn.disabled = true;
         progressContainer.classList.add('active');
         
+        // Show skip button
+        const skipBtn = document.getElementById('skipDemoBtn');
+        if (skipBtn) skipBtn.style.display = 'inline-flex';
+        
+        // Initialize animation controller
+        demoAnimationController = { cancelled: false };
+        
         // Clear console
         consoleEl.innerHTML = '';
         
         const startTime = Date.now();
         
-        // Provisioning workflow steps
+        // Provisioning workflow steps (reduced delays by ~40% for faster demo)
         const steps = [
             { delay: 0, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#60A5FA', prompt: false, progress: 5 },
             { delay: 100, text: '🔄 IAM Provisioning Workflow Started', color: '#60A5FA', prompt: true, progress: 10 },
@@ -418,9 +436,23 @@ function initializeProvisioningDemo() {
         
         // Execute provisioning steps
         for (let i = 0; i < steps.length; i++) {
+            // Check if animation was cancelled
+            if (demoAnimationController && demoAnimationController.cancelled) {
+                showFinalDemoState({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    department: department,
+                    role: role,
+                    username: username
+                }, consoleEl, progressBar, progressText);
+                break;
+            }
+            
             const step = steps[i];
             const prevDelay = i > 0 ? steps[i - 1].delay : 0;
-            await new Promise(resolve => setTimeout(resolve, step.delay - prevDelay));
+            // Reduced delay by 40% for faster demo
+            await new Promise(resolve => setTimeout(resolve, (step.delay - prevDelay) * 0.6));
             
             // Update progress bar
             if (progressBar && progressText) {
@@ -458,9 +490,71 @@ function initializeProvisioningDemo() {
         executionTimeEl.textContent = `Executed in ${executionTime}s`;
         progressContainer.classList.remove('active');
         
+        // Hide skip button
+        const skipBtnEnd = document.getElementById('skipDemoBtn');
+        if (skipBtnEnd) skipBtnEnd.style.display = 'none';
+        
+        // Reset animation controller
+        demoAnimationController = null;
+        
         // Show success notification
         showToast('Success!', 'User provisioned successfully!', 'success');
     });
+}
+
+// Show final state when animation is skipped
+function showFinalDemoState(formData, consoleEl, progressBar, progressText) {
+    // Update progress to 100%
+    if (progressBar) progressBar.style.width = '100%';
+    if (progressText) progressText.textContent = '100%';
+    
+    // Show completed state
+    consoleEl.innerHTML = `
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #60A5FA;">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+        </div>
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #10B981; font-weight: bold;">✨ PROVISIONING COMPLETE ✨</span>
+        </div>
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #60A5FA;">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+        </div>
+        <div class="console-line"></div>
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #60A5FA; font-weight: bold;">📋 SUMMARY:</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #E0E7FF;">   👤 Username: ${formData.username}</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #E0E7FF;">   📧 Email: ${formData.email}</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #E0E7FF;">   🏢 Department: ${formData.department}</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #E0E7FF;">   💼 Role: ${formData.role}</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #10B981;">   ✅ Status: Active</span>
+        </div>
+        <div class="console-line">
+            <span style="color: #E0E7FF;">   🔐 MFA: Required on first login</span>
+        </div>
+        <div class="console-line"></div>
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #10B981; font-weight: bold;">🎉 Welcome aboard, ${formData.firstName}!</span>
+        </div>
+        <div class="console-line">
+            <span class="console-prompt">$</span>
+            <span style="color: #6B7280;">(Animation skipped)</span>
+        </div>
+    `;
 }
 
 // ========================================
@@ -1179,6 +1273,7 @@ window.closeModal = closeModal;
 window.closeToast = closeToast;
 window.copyToClipboard = copyToClipboard;
 window.closeShortcutsHelp = closeShortcutsHelp;
+window.skipDemoAnimation = skipDemoAnimation;
 
 // ========================================
 // Development Helpers (Remove in Production)

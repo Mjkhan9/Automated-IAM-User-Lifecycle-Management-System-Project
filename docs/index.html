@@ -4,12 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IAM Lifecycle Automation Platform | Mohammad Khan</title>
-    <meta name="description" content="Portfolio IAM Lifecycle Automation platform that simulates enterprise Identity & Access Management workflows for AWS and Active Directory.">
+    <meta name="description" content="Enterprise-grade Identity & Access Management automation demonstrating AWS and Active Directory integration with Python and PowerShell.">
     <meta name="author" content="Mohammad Jawad Khan">
     <meta name="theme-color" content="#0066CC">
+    
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content="IAM Lifecycle Automation Platform | Mohammad Khan">
+    <meta property="og:description" content="Enterprise-grade Identity & Access Management automation demonstrating AWS and Active Directory integration">
+    <meta property="og:image" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/images/preview.png">
+    <meta property="og:url" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="IAM Automation Platform">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="IAM Lifecycle Automation Platform">
+    <meta name="twitter:description" content="Enterprise IAM automation with AWS and Active Directory">
+    <meta name="twitter:image" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/images/preview.png">
+    
+    <meta name="keywords" content="IAM, AWS, Active Directory, Identity Management, Cloud Security, DevOps, Automation, Python, PowerShell, CloudFormation, Boto3, Solutions Architect">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/">
+    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,6 +79,7 @@
             <nav class="nav" id="mainNav">
                 <a href="#dashboard" class="nav-link active">Overview</a>
                 <a href="#features" class="nav-link">Capabilities</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
                 <a href="#demo" class="nav-link">Live Demo</a>
                 <a href="#tech" class="nav-link">Stack</a>
                 <a href="#contact" class="nav-link">Contact</a>
@@ -87,6 +107,7 @@
         <nav class="mobile-menu-content">
             <a href="#dashboard" class="mobile-menu-link">Overview</a>
             <a href="#features" class="mobile-menu-link">Capabilities</a>
+            <a href="#architecture" class="mobile-menu-link">Architecture</a>
             <a href="#demo" class="mobile-menu-link">Live Demo</a>
             <a href="#tech" class="mobile-menu-link">Stack</a>
             <a href="#contact" class="mobile-menu-link">Contact</a>
@@ -227,9 +248,9 @@
                             <li>Compliance data archival</li>
                         </ul>
                     </div>
-                    <button class="feature-action" onclick="showFeatureDetails('deprovision')">
+                    <button class="feature-action" onclick="showFeatureDetails('deprovision')" aria-label="Learn more about the de-provisioning workflow" role="button">
                         <span>Learn More</span>
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M3 8h10M9 4l4 4-4 4"/>
                         </svg>
                     </button>
@@ -330,6 +351,86 @@
     </div>
 </section>
 
+<!-- Architecture Section -->
+<section class="section architecture-section" id="architecture">
+    <div class="container">
+        <header class="section-header" data-animate="fade-up">
+            <span class="section-eyebrow">System Design</span>
+            <h2 class="section-title">Architecture Overview</h2>
+            <p class="section-description">
+                End-to-end IAM automation flow from HR trigger to audit logging, 
+                integrating on-premises Active Directory with AWS cloud services.
+            </p>
+        </header>
+        
+        <div class="architecture-content" data-animate="fade-up" data-delay="100">
+            <div class="architecture-diagram">
+                <img src="images/architecture.svg" alt="IAM Platform Architecture Diagram - showing data flow from HR System through PowerShell scripts to Active Directory and AWS services" loading="lazy" width="1200" height="800">
+            </div>
+            
+            <div class="architecture-details" data-animate="fade-up" data-delay="200">
+                <div class="arch-cards-grid">
+                    <div class="arch-card">
+                        <div class="arch-card-icon">🔒</div>
+                        <h4>Security</h4>
+                        <p>Least-privilege IAM, KMS encryption, Secrets Manager for credential storage</p>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-icon">⚡</div>
+                        <h4>Reliability</h4>
+                        <p>Multi-AZ design, error handling with retry logic, graceful degradation</p>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-icon">💰</div>
+                        <h4>Cost Optimized</h4>
+                        <p>Serverless components, lifecycle policies, ~$2-5/month total cost</p>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-icon">📊</div>
+                        <h4>Operational Excellence</h4>
+                        <p>CloudTrail logging, CloudWatch monitoring, automated compliance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="architecture-flow" data-animate="fade-up" data-delay="300">
+            <h3 class="flow-title">Data Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <span class="flow-number">1</span>
+                    <span class="flow-text">HR Event Trigger</span>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <span class="flow-number">2</span>
+                    <span class="flow-text">AD Account Creation</span>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <span class="flow-number">3</span>
+                    <span class="flow-text">AWS IAM Provisioning</span>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <span class="flow-number">4</span>
+                    <span class="flow-text">Secrets Manager</span>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <span class="flow-number">5</span>
+                    <span class="flow-text">SNS Notification</span>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <span class="flow-number">6</span>
+                    <span class="flow-text">CloudTrail Audit</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Demo Section -->
 <section class="section demo-section" id="demo">
     <div class="container">
@@ -414,12 +515,18 @@
                 <div class="panel-header">
                     <h3>Automation Console</h3>
                     <div class="console-actions">
-                        <button class="icon-btn" onclick="clearConsole()" title="Clear">
+                        <button class="icon-btn" id="skipDemoBtn" onclick="skipDemoAnimation()" title="Skip Animation" style="display: none;" aria-label="Skip animation">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                                <line x1="19" y1="5" x2="19" y2="19"></line>
+                            </svg>
+                        </button>
+                        <button class="icon-btn" onclick="clearConsole()" title="Clear" aria-label="Clear console">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                             </svg>
                         </button>
-                        <button class="icon-btn" onclick="exportConsoleLog()" title="Export">
+                        <button class="icon-btn" onclick="exportConsoleLog()" title="Export" aria-label="Export console log">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                             </svg>

@@ -6,7 +6,7 @@ Date: December 2025
 Production-grade IAM automation implementing:
 - Least-privilege access with managed policies
 - Group-based role assignment
-- Secure credential handling with S3 storage
+- Secure credential handling with AWS Secrets Manager
 - SNS notifications for credential delivery
 - Comprehensive audit logging via CloudTrail
 """
@@ -20,7 +20,7 @@ import string
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
-from botocore.exceptions import ClientError, BotoCoreError
+from botocore.exceptions import ClientError, BotoCoreError, ParamValidationError
 from functools import wraps
 import time
 
@@ -175,6 +175,7 @@ class IAMProvisioner:
         self._iam_client = None
         self._s3_client = None
         self._sns_client = None
+        self._secrets_client = None
         self.provisioned_users: List[ProvisioningResult] = []
         
         if not demo_mode:
@@ -188,9 +189,13 @@ class IAMProvisioner:
             self._iam_client = boto3.client('iam')
             self._s3_client = boto3.client('s3')
             self._sns_client = boto3.client('sns')
+            self._secrets_client = boto3.client('secretsmanager')
             logger.info("AWS clients initialized successfully")
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.error(f"Failed to initialize AWS clients: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error initializing AWS clients: {e}")
             raise
     
     @property
@@ -243,7 +248,7 @@ class IAMProvisioner:
             password = self._generate_password()
             self._set_login_profile(request.username, password)
             
-            # Step 5: Store credentials securely
+            # Step 5: Store credentials securely in Secrets Manager
             creds_location = self._store_credentials(request, password)
             
             # Step 6: Send notification
@@ -262,13 +267,53 @@ class IAMProvisioner:
             logger.info(f"Successfully provisioned: {request.username}")
             
             return result
-            
-        except Exception as e:
-            logger.error(f"Failed to provision {request.username}: {e}")
+        
+        except ClientError as e:
+            error_code = e.response.get('Error', {}).get('Code', '')
+            error_handlers = {
+                'EntityAlreadyExists': lambda: f"User {request.username} already exists",
+                'LimitExceeded': lambda: "IAM user limit reached - contact AWS support",
+                'MalformedPolicyDocument': lambda: "Invalid policy document",
+                'NoSuchEntity': lambda: "Referenced resource not found",
+                'InvalidInput': lambda: f"Invalid input: {e.response['Error']['Message']}"
+            }
+            handler = error_handlers.get(error_code, lambda: str(e))
+            error_message = handler()
+            logger.error(f"AWS ClientError for {request.username}: {error_message}")
             return ProvisioningResult(
                 username=request.username,
                 success=False,
-                message=str(e),
+                message=error_message,
+                groups_assigned=groups_assigned,
+                policies_attached=policies_attached
+            )
+        
+        except BotoCoreError as e:
+            logger.error(f"AWS connection error for {request.username}: {e}")
+            return ProvisioningResult(
+                username=request.username,
+                success=False,
+                message=f"AWS connection error: {str(e)}",
+                groups_assigned=groups_assigned,
+                policies_attached=policies_attached
+            )
+        
+        except ParamValidationError as e:
+            logger.error(f"Parameter validation error: {e}")
+            return ProvisioningResult(
+                username=request.username,
+                success=False,
+                message=f"Parameter validation error: {str(e)}",
+                groups_assigned=groups_assigned,
+                policies_attached=policies_attached
+            )
+            
+        except Exception as e:
+            logger.error(f"Unexpected error provisioning {request.username}: {e}")
+            return ProvisioningResult(
+                username=request.username,
+                success=False,
+                message=f"Unexpected error: {str(e)}",
                 groups_assigned=groups_assigned,
                 policies_attached=policies_attached
             )
@@ -371,8 +416,8 @@ class IAMProvisioner:
         logger.info(f"Created login profile for: {username}")
     
     def _store_credentials(self, request: UserRequest, password: str) -> str:
-        """Store credentials securely in S3 with encryption"""
-        key = f"credentials/{request.department}/{request.username}.json"
+        """Store credentials securely in AWS Secrets Manager with automatic rotation"""
+        secret_name = f"iam-credentials/{request.department}/{request.username}"
         
         credentials_data = {
             "username": request.username,
@@ -380,22 +425,36 @@ class IAMProvisioner:
             "temporary_password": password,
             "console_url": "https://company.signin.aws.amazon.com/console",
             "created_at": datetime.now().isoformat(),
-            "notes": "Password reset required on first login"
+            "requires_password_reset": True
         }
         
         if self.demo_mode:
-            logger.info(f"[DEMO] Would store credentials at: s3://{CREDENTIALS_BUCKET}/{key}")
-            return f"s3://{CREDENTIALS_BUCKET}/{key}"
+            logger.info(f"[DEMO] Would store credentials in Secrets Manager: {secret_name}")
+            return f"secretsmanager:{secret_name}"
         
-        self._s3_client.put_object(
-            Bucket=CREDENTIALS_BUCKET,
-            Key=key,
-            Body=json.dumps(credentials_data),
-            ServerSideEncryption='aws:kms',
-            ContentType='application/json'
-        )
+        try:
+            self._secrets_client.create_secret(
+                Name=secret_name,
+                SecretString=json.dumps(credentials_data),
+                Tags=[
+                    {"Key": "Department", "Value": request.department},
+                    {"Key": "ManagedBy", "Value": "IAM-Automation"},
+                    {"Key": "CreatedDate", "Value": datetime.now().strftime("%Y-%m-%d")}
+                ]
+            )
+            logger.info(f"Created secret: {secret_name}")
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceExistsException':
+                # Update existing secret
+                self._secrets_client.put_secret_value(
+                    SecretId=secret_name,
+                    SecretString=json.dumps(credentials_data)
+                )
+                logger.info(f"Updated existing secret: {secret_name}")
+            else:
+                raise
         
-        return f"s3://{CREDENTIALS_BUCKET}/{key}"
+        return f"secretsmanager:{secret_name}"
     
     def _send_notification(self, request: UserRequest, creds_location: str):
         """Send notification via SNS"""

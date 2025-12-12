@@ -1,0 +1,677 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  IAM Lifecycle Automation Platform Infrastructure
+  
+  This template deploys the complete infrastructure for the IAM automation platform:
+  - S3 bucket for credential storage (KMS encrypted)
+  - S3 bucket for audit logs (7-year retention)
+  - KMS key for encryption
+  - SNS topic for notifications
+  - IAM role for automation scripts
+  - CloudTrail for audit logging
+  
+  Author: Mohammad Khan
+  Version: 1.0.0
+
+# =============================================================================
+# METADATA
+# =============================================================================
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Environment Configuration"
+        Parameters:
+          - Environment
+          - ProjectName
+      - Label:
+          default: "Notification Settings"
+        Parameters:
+          - NotificationEmail
+          - EnableEmailNotifications
+      - Label:
+          default: "Retention Settings"
+        Parameters:
+          - AuditLogRetentionDays
+          - CredentialRetentionDays
+    ParameterLabels:
+      Environment:
+        default: "Deployment Environment"
+      NotificationEmail:
+        default: "Notification Email Address"
+
+# =============================================================================
+# PARAMETERS
+# =============================================================================
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment environment (affects resource naming and retention policies)
+
+  ProjectName:
+    Type: String
+    Default: iam-automation
+    Description: Project name used for resource naming
+    AllowedPattern: ^[a-z0-9-]+$
+    ConstraintDescription: Must contain only lowercase letters, numbers, and hyphens
+
+  NotificationEmail:
+    Type: String
+    Description: Email address for SNS notifications (leave empty to skip subscription)
+    Default: ""
+
+  EnableEmailNotifications:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to enable email notifications via SNS
+
+  AuditLogRetentionDays:
+    Type: Number
+    Default: 2555
+    Description: Number of days to retain audit logs (default 7 years for compliance)
+    MinValue: 90
+    MaxValue: 3650
+
+  CredentialRetentionDays:
+    Type: Number
+    Default: 90
+    Description: Number of days to retain credential files before archival
+    MinValue: 30
+    MaxValue: 365
+
+# =============================================================================
+# CONDITIONS
+# =============================================================================
+Conditions:
+  # Only create email subscription if email is provided and notifications enabled
+  CreateEmailSubscription: !And
+    - !Not [!Equals [!Ref NotificationEmail, ""]]
+    - !Equals [!Ref EnableEmailNotifications, "true"]
+  
+  # Production environment gets additional security measures
+  IsProduction: !Equals [!Ref Environment, "prod"]
+
+# =============================================================================
+# RESOURCES
+# =============================================================================
+Resources:
+
+  # ---------------------------------------------------------------------------
+  # KMS KEY - For encrypting credentials and audit logs
+  # ---------------------------------------------------------------------------
+  CredentialsKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub "KMS key for ${ProjectName} credential and audit log encryption (${Environment})"
+      EnableKeyRotation: true
+      PendingWindowInDays: !If [IsProduction, 30, 7]
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: iam-automation-key-policy
+        Statement:
+          # Allow root account full access (required)
+          - Sid: EnableRootAccountPermissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: kms:*
+            Resource: '*'
+          
+          # Allow CloudTrail to use the key
+          - Sid: AllowCloudTrailEncryption
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+            Condition:
+              StringLike:
+                kms:EncryptionContext:aws:cloudtrail:arn: !Sub "arn:aws:cloudtrail:*:${AWS::AccountId}:trail/*"
+          
+          # Allow SNS to use the key
+          - Sid: AllowSNSEncryption
+            Effect: Allow
+            Principal:
+              Service: sns.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
+          
+          # Allow S3 to use the key
+          - Sid: AllowS3Encryption
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-kms-key-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # KMS Key Alias for easier reference
+  CredentialsKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${ProjectName}-key-${Environment}"
+      TargetKeyId: !Ref CredentialsKMSKey
+
+  # ---------------------------------------------------------------------------
+  # S3 BUCKET - Credentials Storage (encrypted, versioned, private)
+  # ---------------------------------------------------------------------------
+  CredentialsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ProjectName}-credentials-${Environment}-${AWS::AccountId}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !GetAtt CredentialsKMSKey.Arn
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToInfrequentAccess
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: !Ref CredentialRetentionDays
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 365
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 90
+      LoggingConfiguration:
+        DestinationBucketName: !Ref AuditLogsBucket
+        LogFilePrefix: s3-access-logs/credentials/
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-credentials-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: DataClassification
+          Value: Confidential
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Bucket policy for credentials bucket
+  CredentialsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CredentialsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Deny non-HTTPS access
+          - Sid: DenyNonHTTPS
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt CredentialsBucket.Arn
+              - !Sub "${CredentialsBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+          
+          # Deny unencrypted uploads
+          - Sid: DenyUnencryptedUploads
+            Effect: Deny
+            Principal: '*'
+            Action: s3:PutObject
+            Resource: !Sub "${CredentialsBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: aws:kms
+
+  # ---------------------------------------------------------------------------
+  # S3 BUCKET - Audit Logs (7-year retention for compliance)
+  # ---------------------------------------------------------------------------
+  AuditLogsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ProjectName}-audit-logs-${Environment}-${AWS::AccountId}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !GetAtt CredentialsKMSKey.Arn
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      ObjectLockEnabled: !If [IsProduction, true, false]
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 90
+          - Id: ExpireAfterRetention
+            Status: Enabled
+            ExpirationInDays: !Ref AuditLogRetentionDays
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-audit-logs-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: DataClassification
+          Value: Audit
+        - Key: RetentionPolicy
+          Value: !Sub "${AuditLogRetentionDays} days"
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Bucket policy for audit logs
+  AuditLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AuditLogsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Allow CloudTrail to write logs
+          - Sid: AllowCloudTrailAclCheck
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt AuditLogsBucket.Arn
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub "arn:aws:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-audit-trail-${Environment}"
+          
+          - Sid: AllowCloudTrailWrite
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${AuditLogsBucket.Arn}/AWSLogs/${AWS::AccountId}/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+                aws:SourceArn: !Sub "arn:aws:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${ProjectName}-audit-trail-${Environment}"
+          
+          # Allow S3 server access logging
+          - Sid: AllowS3LogDelivery
+            Effect: Allow
+            Principal:
+              Service: logging.s3.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${AuditLogsBucket.Arn}/s3-access-logs/*"
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub "arn:aws:s3:::${ProjectName}-*-${Environment}-${AWS::AccountId}"
+          
+          # Deny non-HTTPS
+          - Sid: DenyNonHTTPS
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt AuditLogsBucket.Arn
+              - !Sub "${AuditLogsBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  # ---------------------------------------------------------------------------
+  # SNS TOPIC - Notifications
+  # ---------------------------------------------------------------------------
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${ProjectName}-notifications-${Environment}"
+      DisplayName: !Sub "IAM Automation Notifications (${Environment})"
+      KmsMasterKeyId: !Ref CredentialsKMSKey
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-notifications-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # SNS Topic Policy
+  NotificationTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref NotificationTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAutomationRole
+            Effect: Allow
+            Principal:
+              AWS: !GetAtt AutomationRole.Arn
+            Action: sns:Publish
+            Resource: !Ref NotificationTopic
+
+  # Email subscription (conditional)
+  NotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: CreateEmailSubscription
+    Properties:
+      TopicArn: !Ref NotificationTopic
+      Protocol: email
+      Endpoint: !Ref NotificationEmail
+
+  # ---------------------------------------------------------------------------
+  # IAM ROLE - For automation scripts and Lambda functions
+  # ---------------------------------------------------------------------------
+  AutomationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-automation-role-${Environment}"
+      Description: IAM role for IAM lifecycle automation scripts
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Allow Lambda to assume this role
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+          # Allow EC2 instances (for running scripts)
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-automation-role-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # IAM Policy for automation
+  AutomationPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "${ProjectName}-automation-policy-${Environment}"
+      Roles:
+        - !Ref AutomationRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # IAM User Management
+          - Sid: IAMUserManagement
+            Effect: Allow
+            Action:
+              - iam:CreateUser
+              - iam:DeleteUser
+              - iam:GetUser
+              - iam:UpdateUser
+              - iam:ListUsers
+              - iam:TagUser
+              - iam:UntagUser
+              - iam:ListUserTags
+            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:user/*"
+          
+          # IAM Group Management
+          - Sid: IAMGroupManagement
+            Effect: Allow
+            Action:
+              - iam:AddUserToGroup
+              - iam:RemoveUserFromGroup
+              - iam:ListGroups
+              - iam:ListGroupsForUser
+              - iam:GetGroup
+            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:group/*"
+          
+          # IAM Policy Management (attach/detach only)
+          - Sid: IAMPolicyManagement
+            Effect: Allow
+            Action:
+              - iam:AttachUserPolicy
+              - iam:DetachUserPolicy
+              - iam:ListAttachedUserPolicies
+              - iam:ListUserPolicies
+            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:user/*"
+          
+          # IAM Login Profile and Access Keys
+          - Sid: IAMCredentialManagement
+            Effect: Allow
+            Action:
+              - iam:CreateLoginProfile
+              - iam:DeleteLoginProfile
+              - iam:GetLoginProfile
+              - iam:UpdateLoginProfile
+              - iam:CreateAccessKey
+              - iam:DeleteAccessKey
+              - iam:ListAccessKeys
+              - iam:UpdateAccessKey
+              - iam:GetAccessKeyLastUsed
+            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:user/*"
+          
+          # IAM MFA Management (read-only for compliance)
+          - Sid: IAMMFAReadOnly
+            Effect: Allow
+            Action:
+              - iam:ListMFADevices
+              - iam:GetMFADevice
+            Resource: "*"
+          
+          # Secrets Manager
+          - Sid: SecretsManagerAccess
+            Effect: Allow
+            Action:
+              - secretsmanager:CreateSecret
+              - secretsmanager:PutSecretValue
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DeleteSecret
+              - secretsmanager:TagResource
+              - secretsmanager:ListSecrets
+              - secretsmanager:DescribeSecret
+            Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:iam-credentials/*"
+          
+          # S3 Credentials Bucket
+          - Sid: S3CredentialsAccess
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:DeleteObject
+              - s3:ListBucket
+            Resource:
+              - !GetAtt CredentialsBucket.Arn
+              - !Sub "${CredentialsBucket.Arn}/*"
+          
+          # SNS Publishing
+          - Sid: SNSPublish
+            Effect: Allow
+            Action:
+              - sns:Publish
+            Resource: !Ref NotificationTopic
+          
+          # KMS Usage
+          - Sid: KMSUsage
+            Effect: Allow
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:GenerateDataKey
+              - kms:GenerateDataKeyWithoutPlaintext
+              - kms:DescribeKey
+            Resource: !GetAtt CredentialsKMSKey.Arn
+          
+          # CloudWatch Logs
+          - Sid: CloudWatchLogs
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/${ProjectName}/*"
+
+  # Instance profile for EC2-based automation
+  AutomationInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${ProjectName}-automation-profile-${Environment}"
+      Roles:
+        - !Ref AutomationRole
+
+  # ---------------------------------------------------------------------------
+  # CLOUDTRAIL - Audit logging
+  # ---------------------------------------------------------------------------
+  AuditTrail:
+    Type: AWS::CloudTrail::Trail
+    DependsOn: AuditLogsBucketPolicy
+    Properties:
+      TrailName: !Sub "${ProjectName}-audit-trail-${Environment}"
+      S3BucketName: !Ref AuditLogsBucket
+      IsMultiRegionTrail: true
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsLogging: true
+      KMSKeyId: !GetAtt CredentialsKMSKey.Arn
+      EventSelectors:
+        - ReadWriteType: All
+          IncludeManagementEvents: true
+          DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                - !Sub "${CredentialsBucket.Arn}/"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-audit-trail-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # ---------------------------------------------------------------------------
+  # CLOUDWATCH LOG GROUP - For automation logs
+  # ---------------------------------------------------------------------------
+  AutomationLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/${ProjectName}/automation-${Environment}"
+      RetentionInDays: !If [IsProduction, 365, 30]
+      KmsKeyId: !GetAtt CredentialsKMSKey.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-logs-${Environment}"
+        - Key: Environment
+          Value: !Ref Environment
+
+# =============================================================================
+# OUTPUTS
+# =============================================================================
+Outputs:
+  CredentialsBucketName:
+    Description: Name of the S3 bucket for credential storage
+    Value: !Ref CredentialsBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-CredentialsBucket"
+
+  CredentialsBucketArn:
+    Description: ARN of the credentials S3 bucket
+    Value: !GetAtt CredentialsBucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CredentialsBucketArn"
+
+  AuditLogsBucketName:
+    Description: Name of the S3 bucket for audit logs
+    Value: !Ref AuditLogsBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-AuditLogsBucket"
+
+  NotificationTopicArn:
+    Description: ARN of the SNS notification topic
+    Value: !Ref NotificationTopic
+    Export:
+      Name: !Sub "${AWS::StackName}-NotificationTopic"
+
+  AutomationRoleArn:
+    Description: ARN of the IAM automation role
+    Value: !GetAtt AutomationRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-AutomationRole"
+
+  AutomationRoleName:
+    Description: Name of the IAM automation role
+    Value: !Ref AutomationRole
+    Export:
+      Name: !Sub "${AWS::StackName}-AutomationRoleName"
+
+  KMSKeyArn:
+    Description: ARN of the KMS encryption key
+    Value: !GetAtt CredentialsKMSKey.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-KMSKeyArn"
+
+  KMSKeyAlias:
+    Description: Alias of the KMS encryption key
+    Value: !Ref CredentialsKMSKeyAlias
+    Export:
+      Name: !Sub "${AWS::StackName}-KMSKeyAlias"
+
+  CloudTrailArn:
+    Description: ARN of the CloudTrail trail
+    Value: !GetAtt AuditTrail.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudTrail"
+
+  Environment:
+    Description: Deployment environment
+    Value: !Ref Environment
+    Export:
+      Name: !Sub "${AWS::StackName}-Environment"
+
+  StackRegion:
+    Description: AWS Region where stack is deployed
+    Value: !Ref AWS::Region
+    Export:
+      Name: !Sub "${AWS::StackName}-Region"
+

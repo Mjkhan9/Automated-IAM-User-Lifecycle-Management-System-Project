@@ -104,18 +104,53 @@ begin {
     }
     
     function New-SecurePassword {
-        param([int]$Length = 16)
+        param(
+            [int]$Length = 20,
+            [int]$SpecialCharCount = 4
+        )
         
-        $Chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"
-        $Password = -join ((1..$Length) | ForEach-Object { $Chars[(Get-Random -Maximum $Chars.Length)] })
+        # Use .NET's cryptographic random generator for better security
+        Add-Type -AssemblyName System.Web
         
-        # Ensure complexity requirements
-        if ($Password -notmatch "[A-Z]") { $Password = "A" + $Password.Substring(1) }
-        if ($Password -notmatch "[a-z]") { $Password = $Password.Substring(0,1) + "a" + $Password.Substring(2) }
-        if ($Password -notmatch "[0-9]") { $Password = $Password.Substring(0,2) + "1" + $Password.Substring(3) }
-        if ($Password -notmatch "[!@#$%^&*]") { $Password = $Password.Substring(0,3) + "!" + $Password.Substring(4) }
+        do {
+            $Password = [System.Web.Security.Membership]::GeneratePassword($Length, $SpecialCharCount)
+            
+            # Validate complexity requirements
+            $hasUpper = $Password -cmatch '[A-Z]'
+            $hasLower = $Password -cmatch '[a-z]'
+            $hasDigit = $Password -match '\d'
+            $hasSpecial = $Password -match '[!@#$%^&*()_+=\-\[\]{}|;:,.<>?]'
+            
+        } while (-not ($hasUpper -and $hasLower -and $hasDigit -and $hasSpecial))
         
         return $Password
+    }
+    
+    function Test-UserInput {
+        param(
+            [string]$FirstName,
+            [string]$LastName,
+            [string]$Email
+        )
+        
+        $errors = @()
+        
+        if ($FirstName -notmatch '^[a-zA-Z\-]{2,50}$') {
+            $errors += "Invalid first name format (must be 2-50 letters or hyphens)"
+        }
+        
+        if ($LastName -notmatch '^[a-zA-Z\-]{2,50}$') {
+            $errors += "Invalid last name format (must be 2-50 letters or hyphens)"
+        }
+        
+        if ($Email -notmatch '^[\w\.\-]+@[\w\.\-]+\.\w{2,}$') {
+            $errors += "Invalid email format"
+        }
+        
+        return @{
+            IsValid = $errors.Count -eq 0
+            Errors = $errors
+        }
     }
     
     function Get-SamAccountName {
