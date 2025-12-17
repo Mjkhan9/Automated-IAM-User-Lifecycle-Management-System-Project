@@ -73,7 +73,7 @@ Handles the **complete user lifecycle** automatically:
 **Hybrid Architecture:**
 - **On-Premises:** PowerShell scripts manage Active Directory
 - **Cloud:** Python/Boto3 handles AWS IAM seamlessly
-- **Security:** KMS encryption + Secrets Manager throughout
+- **Security:** Secrets Manager for encrypted credential storage (KMS encryption managed by AWS)
 
 ### Component Breakdown
 
@@ -86,11 +86,14 @@ Handles the **complete user lifecycle** automatically:
 **AWS IAM Automation (Python/Boto3)**
 - `iam_provisioner.py` - Creates IAM users with least-privilege policies based on role
 - `compliance_audit.py` - Runs automated CIS Benchmark compliance checks
+- Uses IAM, S3, SNS, and Secrets Manager clients for provisioning workflows
 
 **Infrastructure (CloudFormation)**
-- Deploys Secrets Manager for encrypted credential storage
+- Deploys Secrets Manager for encrypted credential storage (AWS-managed KMS encryption)
 - Sets up SNS topics for manager notifications and alerts
 - Configures CloudTrail with S3 logging for audit trails
+
+**Note:** This is a CLI-based automation system. A Flask-based web console is planned for future enhancement.
 
 ---
 
@@ -174,7 +177,7 @@ deploy/
 ## Key Features
 
 ### ✅ Security by Design
-- **Encryption at Rest:** KMS keys for Secrets Manager, S3, CloudTrail
+- **Encryption at Rest:** AWS-managed KMS encryption for Secrets Manager, S3, CloudTrail
 - **Encryption in Transit:** TLS 1.2+ for all API calls
 - **Least Privilege:** Users only get minimum permissions for their role
 - **MFA Enforcement:** All console access requires multi-factor authentication
