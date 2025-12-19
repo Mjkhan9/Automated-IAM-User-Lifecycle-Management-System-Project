@@ -6,9 +6,9 @@
 
 Identity and Access Management automation for hybrid Active Directory and AWS environments.
 
-## The Problem I Solved
+## The Problem
 
-At my current role managing 150-200+ monthly incidents, I was manually provisioning users:
+Manual identity provisioning across hybrid AD and AWS environments introduces latency, configuration drift, and audit risk:
 
 1. **Active Directory** - Create account, set OU, configure security groups (1-2 hours)
 2. **AWS IAM** - Duplicate the entire process in AWS (1-2 hours)
@@ -17,7 +17,7 @@ At my current role managing 150-200+ monthly incidents, I was manually provision
 
 **Total: 4+ hours per user. Error-prone. Repetitive at scale.**
 
-This platform automates the entire workflow end-to-end with zero manual intervention.
+This platform automates user lifecycle events with consistent policy application and immutable audit trails.
 
 **[📺 Live Demo](https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/)**
 
@@ -33,6 +33,21 @@ Handles the **complete user lifecycle** automatically:
 | **De-provisioning** | Secure offboarding with data archival and revocation | 2 hours |
 | **Compliance** | Continuous CIS Benchmark checks and dormant account detection | 1 hour/month |
 | **Audit Trail** | 7-year retention logs for regulatory compliance | Automatic |
+
+---
+
+## Failure Modes & Safeguards
+
+Handled explicitly:
+- Partial provisioning (AD succeeds, AWS fails)
+- Duplicate user detection
+- Policy attachment conflicts
+
+Not handled automatically:
+- Conflicting HR source data
+- Privilege escalation requests outside predefined roles
+
+These require manual review by design.
 
 ---
 
@@ -183,11 +198,11 @@ deploy/
 - **MFA Enforcement:** All console access requires multi-factor authentication
 - **Audit Everything:** CloudTrail logs every API call (7-year retention)
 
-### ✅ Compliance Built-In
+### ✅ Designed to Support Compliance Controls
 - **CIS AWS Foundations Benchmark** automated checks
-- **FERPA compliant** (education data isolation)
-- **HIPAA compatible** (encryption, audit trails)
-- **SOX audit-ready** (complete access logs)
+- Designed to support **FERPA-aligned** access controls (education data isolation)
+- Designed to support **HIPAA-aligned** controls (encryption, audit trails)
+- Designed to support **SOX audit requirements** (complete access logs)
 
 ### ✅ Real-World Operations
 - **Error Handling:** Retry logic with exponential backoff
