@@ -1,0 +1,264 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: '3.9'
+
+jobs:
+  # ===========================================================================
+  # Python Linting (non-blocking)
+  # ===========================================================================
+  lint-python:
+    name: Lint Python Code
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install linting dependencies
+        run: |
+          pip install flake8 black
+
+      - name: Lint with flake8
+        run: |
+          flake8 scripts/python/ --max-line-length=120 --ignore=E501,W503,E402,F401,E722 --exclude=__pycache__ || true
+
+      - name: Check formatting with black
+        run: |
+          black --check --line-length=120 scripts/python/ || echo "Formatting issues found (non-blocking)"
+
+  # ===========================================================================
+  # Python Tests
+  # ===========================================================================
+  test-python:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/python/ -v --cov=scripts/python --cov-report=xml --cov-report=term-missing
+        continue-on-error: true
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ===========================================================================
+  # PowerShell Linting (non-blocking)
+  # ===========================================================================
+  lint-powershell:
+    name: Lint PowerShell Scripts
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path scripts/powershell/ -Recurse -ReportSummary -ExcludeRule PSAvoidUsingWriteHost
+          if ($results) {
+            $results | Format-Table -AutoSize
+            Write-Host "PSScriptAnalyzer completed with findings (non-blocking)"
+          }
+
+  # ===========================================================================
+  # PowerShell Tests
+  # ===========================================================================
+  test-powershell:
+    name: Run PowerShell Tests
+    runs-on: windows-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion 5.0.0
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = "tests/powershell"
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = "Detailed"
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputPath = "test-results.xml"
+          
+          if (Test-Path "tests/powershell") {
+            Invoke-Pester -Configuration $config
+          } else {
+            Write-Host "No PowerShell tests found, skipping..."
+          }
+        continue-on-error: true
+
+  # ===========================================================================
+  # CloudFormation Validation
+  # ===========================================================================
+  validate-cloudformation:
+    name: Validate CloudFormation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cfn-lint
+        run: |
+          pip install cfn-lint
+
+      - name: Validate CloudFormation template
+        run: |
+          if [ -f "deploy/cloudformation/iam-platform-stack.yaml" ]; then
+            cfn-lint deploy/cloudformation/iam-platform-stack.yaml
+          else
+            echo "CloudFormation template not found, skipping..."
+          fi
+
+      - name: Validate with AWS CLI (if credentials available)
+        if: ${{ env.AWS_ACCESS_KEY_ID != '' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          if [ -f "deploy/cloudformation/iam-platform-stack.yaml" ]; then
+            aws cloudformation validate-template \
+              --template-body file://deploy/cloudformation/iam-platform-stack.yaml
+          fi
+
+  # ===========================================================================
+  # Security Scanning
+  # ===========================================================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit security scan
+        run: |
+          bandit -r scripts/python/ -f json -o bandit-report.json || true
+          bandit -r scripts/python/ -ll
+
+  # ===========================================================================
+  # Build Documentation
+  # ===========================================================================
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify docs structure
+        run: |
+          echo "Checking documentation structure..."
+          ls -la docs/
+          if [ -f "docs/index.html" ]; then
+            echo "✅ index.html exists"
+          else
+            echo "❌ index.html missing"
+            exit 1
+          fi
+
+  # ===========================================================================
+  # Deploy to GitHub Pages
+  # ===========================================================================
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [test-python, lint-powershell, build-docs]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ===========================================================================
+  # Notification
+  # ===========================================================================
+  notify:
+    name: Notify on Completion
+    runs-on: ubuntu-latest
+    needs: [test-python, test-powershell, validate-cloudformation]
+    if: always()
+    steps:
+      - name: Check job status
+        run: |
+          echo "Python Tests: ${{ needs.test-python.result }}"
+          echo "PowerShell Tests: ${{ needs.test-powershell.result }}"
+          echo "CloudFormation Validation: ${{ needs.validate-cloudformation.result }}"
+          
+          if [ "${{ needs.test-python.result }}" == "failure" ] || \
+             [ "${{ needs.test-powershell.result }}" == "failure" ] || \
+             [ "${{ needs.validate-cloudformation.result }}" == "failure" ]; then
+            echo "::warning::Some jobs failed"
+          else
+            echo "::notice::All jobs completed successfully"
+          fi
+

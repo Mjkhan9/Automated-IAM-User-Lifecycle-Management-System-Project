@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="awsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9900;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6600;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="adGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005A9E;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="securityGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="hrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Drop Shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+    
+    <!-- Arrow Marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6B7280"/>
+    </marker>
+    <marker id="arrowheadBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0066CC"/>
+    </marker>
+    <marker id="arrowheadOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#FF9900"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#0F172A"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="#F8FAFC" text-anchor="middle">
+    IAM Lifecycle Automation Platform - Architecture
+  </text>
+  <text x="600" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#94A3B8" text-anchor="middle">
+    Enterprise Identity Management with AWS and Active Directory
+  </text>
+  
+  <!-- HR System Box -->
+  <g transform="translate(50, 100)">
+    <rect width="140" height="80" rx="8" fill="url(#hrGrad)" filter="url(#shadow)"/>
+    <text x="70" y="35" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">🏢 HR System</text>
+    <text x="70" y="55" font-family="Inter, system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Workday / SAP</text>
+  </g>
+  
+  <!-- On-Premises Section -->
+  <g transform="translate(230, 90)">
+    <!-- Section Background -->
+    <rect width="350" height="300" rx="12" fill="rgba(0,120,212,0.1)" stroke="#0078D4" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="175" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#0078D4" text-anchor="middle">On-Premises Infrastructure</text>
+    
+    <!-- Active Directory -->
+    <g transform="translate(20, 50)">
+      <rect width="140" height="100" rx="8" fill="url(#adGrad)" filter="url(#shadow)"/>
+      <text x="70" y="30" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🖥️ Active Directory</text>
+      <text x="70" y="50" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">• Domain Controller</text>
+      <text x="70" y="65" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">• OUs &amp; Groups</text>
+      <text x="70" y="80" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">• Group Policies</text>
+    </g>
+    
+    <!-- PowerShell Scripts -->
+    <g transform="translate(180, 50)">
+      <rect width="150" height="100" rx="8" fill="#1E3A5F" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#60A5FA" text-anchor="middle">⚡ PowerShell</text>
+      <text x="75" y="45" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">New-ADUserProvision.ps1</text>
+      <text x="75" y="58" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">Remove-ADUserDeprovision.ps1</text>
+      <text x="75" y="71" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">Get-DormantAccounts.ps1</text>
+      <text x="75" y="84" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">Sync-ADGroupMembership.ps1</text>
+    </g>
+    
+    <!-- File Server -->
+    <g transform="translate(100, 180)">
+      <rect width="140" height="60" rx="8" fill="#374151" filter="url(#shadow)"/>
+      <text x="70" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#F8FAFC" text-anchor="middle">📂 File Server</text>
+      <text x="70" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">Home Directories</text>
+    </g>
+  </g>
+  
+  <!-- AWS Cloud Section -->
+  <g transform="translate(620, 90)">
+    <!-- Section Background -->
+    <rect width="530" height="380" rx="12" fill="rgba(255,153,0,0.1)" stroke="#FF9900" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="265" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#FF9900" text-anchor="middle">AWS Cloud (VPC)</text>
+    
+    <!-- Python/Boto3 Scripts -->
+    <g transform="translate(20, 50)">
+      <rect width="150" height="80" rx="8" fill="#1E3A5F" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#FCD34D" text-anchor="middle">🐍 Python Boto3</text>
+      <text x="75" y="45" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">iam_provisioner.py</text>
+      <text x="75" y="60" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">compliance_audit.py</text>
+    </g>
+    
+    <!-- IAM Services -->
+    <g transform="translate(190, 50)">
+      <rect width="150" height="80" rx="8" fill="url(#awsGrad)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">👤 AWS IAM</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Users • Groups</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Policies • Roles</text>
+    </g>
+    
+    <!-- Secrets Manager -->
+    <g transform="translate(360, 50)">
+      <rect width="150" height="80" rx="8" fill="#DD3522" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔑 Secrets Manager</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Credential Storage</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Auto Rotation</text>
+    </g>
+    
+    <!-- S3 Bucket -->
+    <g transform="translate(20, 160)">
+      <rect width="150" height="80" rx="8" fill="#569A31" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📦 S3 Bucket</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Audit Archives</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">7-Year Retention</text>
+    </g>
+    
+    <!-- SNS -->
+    <g transform="translate(190, 160)">
+      <rect width="150" height="80" rx="8" fill="#B0084D" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📢 SNS</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Notifications</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Manager Alerts</text>
+    </g>
+    
+    <!-- CloudTrail -->
+    <g transform="translate(360, 160)">
+      <rect width="150" height="80" rx="8" fill="#7B1FA2" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📊 CloudTrail</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Audit Logging</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Compliance</text>
+    </g>
+    
+    <!-- KMS -->
+    <g transform="translate(190, 270)">
+      <rect width="150" height="60" rx="8" fill="url(#securityGrad)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔐 KMS</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Encryption Keys</text>
+    </g>
+  </g>
+  
+  <!-- Email/Notifications -->
+  <g transform="translate(1010, 530)">
+    <rect width="140" height="60" rx="8" fill="#374151" filter="url(#shadow)"/>
+    <text x="70" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#F8FAFC" text-anchor="middle">📧 Email</text>
+    <text x="70" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">Manager Notifications</text>
+  </g>
+  
+  <!-- Web Console -->
+  <g transform="translate(50, 530)">
+    <rect width="160" height="80" rx="8" fill="#1E3A5F" filter="url(#shadow)"/>
+    <text x="80" y="30" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#60A5FA" text-anchor="middle">🌐 Web Console</text>
+    <text x="80" y="50" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">Portfolio Dashboard</text>
+    <text x="80" y="65" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#94A3B8" text-anchor="middle">Live Demo</text>
+  </g>
+  
+  <!-- Connection Lines -->
+  <!-- HR to PowerShell -->
+  <line x1="190" y1="140" x2="230" y2="140" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="210" y="132" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">1</text>
+  
+  <!-- PowerShell to AD -->
+  <line x1="345" y1="150" x2="345" y2="175" stroke="#0078D4" stroke-width="2" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- PowerShell to Python -->
+  <line x1="580" y1="165" x2="620" y2="165" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="600" y="155" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">4</text>
+  
+  <!-- Python to IAM -->
+  <line x1="790" y1="180" x2="810" y2="180" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+  <text x="800" y="170" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">5</text>
+  
+  <!-- Python to Secrets Manager -->
+  <line x1="790" y1="165" x2="980" y2="165" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+  <text x="885" y="155" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">6</text>
+  
+  <!-- Python to SNS -->
+  <line x1="715" y1="220" x2="715" y2="250" stroke="#FF9900" stroke-width="2"/>
+  <line x1="715" y1="250" x2="865" y2="250" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+  <text x="790" y="240" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">7</text>
+  
+  <!-- SNS to Email -->
+  <line x1="885" y1="330" x2="885" y2="530" stroke="#6B7280" stroke-width="2"/>
+  <line x1="885" y1="530" x2="1010" y2="560" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="940" y="545" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">8</text>
+  
+  <!-- CloudTrail to S3 -->
+  <line x1="1055" y1="330" x2="1055" y2="370" stroke="#6B7280" stroke-width="2"/>
+  <line x1="1055" y1="370" x2="715" y2="370" stroke="#6B7280" stroke-width="2"/>
+  <line x1="715" y1="370" x2="715" y2="330" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="885" y="382" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">9</text>
+  
+  <!-- KMS connections (dashed) -->
+  <line x1="885" y1="450" x2="1055" y2="305" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="885" y1="450" x2="1105" y2="220" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="885" y1="450" x2="715" y2="330" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 680)">
+    <rect width="1100" height="100" rx="8" fill="rgba(30,41,59,0.8)" stroke="#374151"/>
+    <text x="550" y="25" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Data Flow Legend</text>
+    
+    <!-- Legend Items -->
+    <g transform="translate(50, 45)">
+      <line x1="0" y1="10" x2="40" y2="10" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Data Flow</text>
+    </g>
+    
+    <g transform="translate(200, 45)">
+      <line x1="0" y1="10" x2="40" y2="10" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">AWS API Call</text>
+    </g>
+    
+    <g transform="translate(370, 45)">
+      <line x1="0" y1="10" x2="40" y2="10" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
+      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Encryption</text>
+    </g>
+    
+    <g transform="translate(520, 45)">
+      <rect width="15" height="15" rx="3" fill="url(#adGrad)"/>
+      <text x="25" y="13" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">On-Premises</text>
+    </g>
+    
+    <g transform="translate(650, 45)">
+      <rect width="15" height="15" rx="3" fill="url(#awsGrad)"/>
+      <text x="25" y="13" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">AWS Services</text>
+    </g>
+    
+    <g transform="translate(790, 45)">
+      <rect width="15" height="15" rx="3" fill="url(#securityGrad)"/>
+      <text x="25" y="13" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Security</text>
+    </g>
+    
+    <!-- Flow Steps -->
+    <text x="550" y="75" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">
+      1: HR Event → 2: AD Account → 3: Groups → 4: Trigger AWS → 5: IAM User → 6: Store Creds → 7: SNS Notify → 8: Email → 9: Audit Log
+    </text>
+  </g>
+  
+  <!-- Copyright -->
+  <text x="600" y="790" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#475569" text-anchor="middle">
+    © 2024 Mohammad Khan | IAM Lifecycle Automation Platform
+  </text>
+</svg>
+
