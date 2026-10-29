@@ -14,8 +14,8 @@ Create a professional preview image for social sharing (Open Graph / Twitter Car
 
 ### Visual Elements
 1. **Title**: "IAM Lifecycle Automation Platform"
-2. **Subtitle**: "Enterprise Identity Management with AWS & Active Directory"
-3. **Author**: Mohammad Khan - AWS Solutions Architect
+2. **Subtitle**: "Enterprise Identity Management with Microsoft Entra ID & Active Directory"
+3. **Author**: Mohammad Khan - IAM & Microsoft Security
 
 ### Key Metrics to Display
 - 8,000+ Users Supported
@@ -28,11 +28,11 @@ Create a professional preview image for social sharing (Open Graph / Twitter Car
   - Primary: #0066CC (blue)
   - Secondary: #14B8A6 (teal)
   - Background: #0F172A (dark) or #F9FAFB (light)
-- Include AWS and Python/PowerShell icons
+- Include Microsoft Entra ID and Python/PowerShell icons
 
 ### Architecture Preview
 - Consider including a simplified version of the architecture diagram
-- Show the flow: HR → AD → AWS → Audit
+- Show the flow: HR → AD → Entra ID → Audit
 
 ## Tools for Creation
 
@@ -49,14 +49,14 @@ Create a professional preview image for social sharing (Open Graph / Twitter Car
 │    🔐 IAM LIFECYCLE AUTOMATION PLATFORM                     │
 │                                                              │
 │    Enterprise Identity Management                            │
-│    AWS • Active Directory • Python • PowerShell             │
+│    Entra ID • Active Directory • Python • PowerShell        │
 │                                                              │
 │    ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │
 │    │  8,000+ │  │   40%   │  │  100%   │  │  98.5%  │      │
 │    │  Users  │  │ Savings │  │ Policy  │  │Compliant│      │
 │    └─────────┘  └─────────┘  └─────────┘  └─────────┘      │
 │                                                              │
-│    Mohammad Khan | AWS Solutions Architect                   │
+│    Mohammad Khan | IAM & Microsoft Security                  │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```

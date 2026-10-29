@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IAM Lifecycle Automation Platform | Mohammad Khan</title>
-    <meta name="description" content="Enterprise-grade Identity & Access Management automation demonstrating AWS and Active Directory integration with Python and PowerShell.">
+    <meta name="description" content="Enterprise-grade Identity & Access Management automation demonstrating Microsoft Entra ID and Active Directory integration with Python and PowerShell.">
     <meta name="author" content="Mohammad Jawad Khan">
     <meta name="theme-color" content="#0066CC">
     
     <!-- SEO Meta Tags -->
     <meta property="og:title" content="IAM Lifecycle Automation Platform | Mohammad Khan">
-    <meta property="og:description" content="Enterprise-grade Identity & Access Management automation demonstrating AWS and Active Directory integration">
+    <meta property="og:description" content="Enterprise-grade Identity & Access Management automation demonstrating Microsoft Entra ID and Active Directory integration">
     <meta property="og:image" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/images/preview.png">
     <meta property="og:url" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/">
     <meta property="og:type" content="website">
@@ -18,10 +18,10 @@
     
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="IAM Lifecycle Automation Platform">
-    <meta name="twitter:description" content="Enterprise IAM automation with AWS and Active Directory">
+    <meta name="twitter:description" content="Enterprise IAM automation with Microsoft Entra ID and Active Directory">
     <meta name="twitter:image" content="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/images/preview.png">
     
-    <meta name="keywords" content="IAM, AWS, Active Directory, Identity Management, Cloud Security, DevOps, Automation, Python, PowerShell, CloudFormation, Boto3, Solutions Architect">
+    <meta name="keywords" content="IAM, Microsoft Entra ID, Active Directory, Identity Management, Cloud Security, DevOps, Automation, Python, PowerShell, Bicep, Microsoft Graph, Azure Key Vault">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://mjkhan9.github.io/Automated-IAM-User-Lifecycle-Management-System-Project/">
     
@@ -122,9 +122,9 @@
         
         <div class="hero-content">
             <div class="hero-eyebrow" data-animate="fade-up">
-                <span class="eyebrow-badge">AWS Certified</span>
+                <span class="eyebrow-badge">Microsoft Entra ID</span>
                 <span class="eyebrow-divider">•</span>
-                <span>Solutions Architect</span>
+                <span>Identity & Access Management</span>
             </div>
 
             <h1 class="hero-title" data-animate="fade-up" data-delay="100">
@@ -134,7 +134,7 @@
 
             <p class="hero-description" data-animate="fade-up" data-delay="200">
                 Portfolio demonstration of enterprise IAM automation patterns: user provisioning, 
-                de-provisioning, and compliance monitoring workflows for Active Directory and AWS—with 
+                de-provisioning, and compliance monitoring workflows for Active Directory and Microsoft Entra ID—with
                 audit logging design for security investigations. <em>Simulation mode for demos.</em>
             </p>
 
@@ -218,11 +218,11 @@
                     </div>
                     <div class="feature-content">
                         <h3>Automated Provisioning</h3>
-                        <p>Create users across AD and AWS IAM with role-based policies. Simulates group assignment, credential generation, and encrypted storage.</p>
+                        <p>Create users across AD and Microsoft Entra ID with role-based access. Simulates group assignment, credential generation, and encrypted storage.</p>
                         <ul class="feature-list">
                             <li>Role-based access control</li>
                             <li>Automated credential management</li>
-                            <li>Encrypted S3 storage</li>
+                            <li>Azure Key Vault storage</li>
                         </ul>
                     </div>
                     <button class="feature-action" onclick="scrollToDemo()">
@@ -291,7 +291,7 @@
                         <ul class="feature-list">
                             <li>Immutable event logs</li>
                             <li>7-year encrypted retention</li>
-                            <li>CloudTrail integration</li>
+                            <li>Entra audit log integration</li>
                         </ul>
                     </div>
                     <button class="feature-action" onclick="showFeatureDetails('audit')">
@@ -332,15 +332,15 @@
                     </svg>
                 </div>
                 <div class="feature-content">
-                    <h3>AWS Integration</h3>
-                    <p>IAM, S3, SNS, and CloudTrail integration patterns with Python boto3 reference implementations.</p>
+                    <h3>Microsoft Entra ID Integration</h3>
+                    <p>Entra ID, Key Vault, Graph mail, and audit log integration patterns with Python Microsoft Graph reference implementations.</p>
                     <ul class="feature-list">
-                        <li>IAM provisioning patterns</li>
-                        <li>SNS notification pipelines</li>
-                        <li>Policy automation examples</li>
+                        <li>Entra provisioning patterns</li>
+                        <li>Graph mail notification pipelines</li>
+                        <li>RBAC role automation examples</li>
                     </ul>
                 </div>
-                <button class="feature-action" onclick="showFeatureDetails('aws')">
+                <button class="feature-action" onclick="showFeatureDetails('entra')">
                     <span>Integration Details</span>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 8h10M9 4l4 4-4 4"/>
@@ -359,13 +359,13 @@
             <h2 class="section-title">Architecture Overview</h2>
             <p class="section-description">
                 End-to-end IAM automation flow from HR trigger to audit logging, 
-                integrating on-premises Active Directory with AWS cloud services.
+                integrating on-premises Active Directory with Microsoft Entra ID and Azure services.
             </p>
         </header>
         
         <div class="architecture-content" data-animate="fade-up" data-delay="100">
             <div class="architecture-diagram">
-                <img src="images/architecture.svg" alt="IAM Platform Architecture Diagram - showing data flow from HR System through PowerShell scripts to Active Directory and AWS services" loading="lazy" width="1200" height="800">
+                <img src="images/architecture.svg" alt="IAM Platform Architecture Diagram - showing data flow from HR System through PowerShell scripts to Active Directory and Microsoft Entra ID services" loading="lazy" width="1200" height="800">
             </div>
             
             <div class="architecture-details" data-animate="fade-up" data-delay="200">
@@ -373,22 +373,22 @@
                     <div class="arch-card">
                         <div class="arch-card-icon">🔒</div>
                         <h4>Security</h4>
-                        <p>Least-privilege IAM, KMS encryption, Secrets Manager for credential storage</p>
+                        <p>Least-privilege RBAC, managed identity, Azure Key Vault for credential storage</p>
                     </div>
                     <div class="arch-card">
                         <div class="arch-card-icon">⚡</div>
                         <h4>Reliability</h4>
-                        <p>Multi-AZ design, error handling with retry logic, graceful degradation</p>
+                        <p>Zone-redundant options, error handling with retry logic, graceful degradation</p>
                     </div>
                     <div class="arch-card">
                         <div class="arch-card-icon">💰</div>
                         <h4>Cost Optimized</h4>
-                        <p>Serverless components, lifecycle policies, ~$2-5/month total cost</p>
+                        <p>Serverless components, lifecycle policies, under $1/month total cost</p>
                     </div>
                     <div class="arch-card">
                         <div class="arch-card-icon">📊</div>
                         <h4>Operational Excellence</h4>
-                        <p>CloudTrail logging, CloudWatch monitoring, automated compliance</p>
+                        <p>Entra audit logs, Azure Monitor, automated compliance</p>
                     </div>
                 </div>
             </div>
@@ -409,22 +409,22 @@
                 <div class="flow-arrow">→</div>
                 <div class="flow-step">
                     <span class="flow-number">3</span>
-                    <span class="flow-text">AWS IAM Provisioning</span>
+                    <span class="flow-text">Entra ID Provisioning</span>
                 </div>
                 <div class="flow-arrow">→</div>
                 <div class="flow-step">
                     <span class="flow-number">4</span>
-                    <span class="flow-text">Secrets Manager</span>
+                    <span class="flow-text">Azure Key Vault</span>
                 </div>
                 <div class="flow-arrow">→</div>
                 <div class="flow-step">
                     <span class="flow-number">5</span>
-                    <span class="flow-text">SNS Notification</span>
+                    <span class="flow-text">Graph Mail Notification</span>
                 </div>
                 <div class="flow-arrow">→</div>
                 <div class="flow-step">
                     <span class="flow-number">6</span>
-                    <span class="flow-text">CloudTrail Audit</span>
+                    <span class="flow-text">Entra Audit Logs</span>
                 </div>
             </div>
         </div>
@@ -573,7 +573,7 @@
                     </svg>
                 </div>
                 <h4>Python</h4>
-                <p>Core automation scripts with boto3 for AWS SDK integration</p>
+                <p>Core automation scripts with Microsoft Graph and the Azure SDK</p>
             </div>
 
             <div class="tech-card">
@@ -589,11 +589,11 @@
             <div class="tech-card">
                 <div class="tech-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
-                        <path d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576.04.063.056.127.056.183 0 .08-.048.16-.152.24l-.503.335a.383.383 0 0 1-.208.072c-.08 0-.16-.04-.239-.112a2.47 2.47 0 0 1-.287-.375 6.18 6.18 0 0 1-.248-.471c-.622.734-1.405 1.101-2.347 1.101-.67 0-1.205-.191-1.596-.574-.391-.384-.59-.894-.59-1.533 0-.678.239-1.23.726-1.644.487-.415 1.133-.623 1.955-.623.272 0 .551.024.846.064.296.04.6.104.918.176v-.583c0-.607-.127-1.03-.375-1.277-.255-.248-.686-.367-1.3-.367-.28 0-.568.031-.863.103-.295.072-.583.16-.862.272a2.287 2.287 0 0 1-.28.104.488.488 0 0 1-.127.023c-.112 0-.168-.08-.168-.247v-.391c0-.128.016-.224.056-.28a.597.597 0 0 1 .224-.167c.279-.144.614-.264 1.005-.36a4.84 4.84 0 0 1 1.246-.151c.95 0 1.644.216 2.091.647.439.43.662 1.085.662 1.963v2.586zm-3.24 1.214c.263 0 .534-.048.822-.144.287-.096.543-.271.758-.51.128-.152.224-.32.272-.512.047-.191.08-.423.08-.694v-.335a6.66 6.66 0 0 0-.735-.136 6.02 6.02 0 0 0-.75-.048c-.535 0-.926.104-1.19.32-.263.215-.39.518-.39.917 0 .375.095.655.295.846.191.2.47.296.838.296zm6.41.862c-.144 0-.24-.024-.304-.08-.064-.048-.12-.16-.168-.311L7.586 5.55a1.398 1.398 0 0 1-.072-.32c0-.128.064-.2.191-.2h.783c.151 0 .255.025.31.08.065.048.113.16.16.312l1.342 5.284 1.245-5.284c.04-.16.088-.264.151-.312a.549.549 0 0 1 .32-.08h.638c.152 0 .256.025.32.08.063.048.12.16.151.312l1.261 5.348 1.381-5.348c.048-.16.104-.264.16-.312a.52.52 0 0 1 .311-.08h.743c.127 0 .2.065.2.2 0 .04-.009.08-.017.128a1.137 1.137 0 0 1-.056.2l-1.923 6.17c-.048.16-.104.263-.168.311a.51.51 0 0 1-.303.08h-.687c-.151 0-.255-.024-.32-.08-.063-.056-.119-.16-.15-.32l-1.238-5.148-1.23 5.14c-.04.16-.087.264-.15.32-.065.056-.177.08-.32.08zm10.256.215c-.415 0-.83-.048-1.229-.143-.399-.096-.71-.2-.918-.32-.128-.071-.215-.151-.247-.223a.563.563 0 0 1-.048-.224v-.407c0-.167.064-.247.183-.247.048 0 .096.008.144.024.048.016.12.048.2.08.271.12.566.215.878.279.319.064.63.096.95.096.502 0 .894-.088 1.165-.264a.86.86 0 0 0 .415-.758.777.777 0 0 0-.215-.559c-.144-.151-.416-.287-.807-.415l-1.157-.36c-.583-.183-1.014-.454-1.277-.813a1.902 1.902 0 0 1-.4-1.158c0-.335.073-.63.216-.886.144-.255.335-.479.575-.654.24-.184.51-.32.83-.415.32-.096.655-.136 1.006-.136.175 0 .359.008.535.032.183.024.35.056.518.088.16.04.312.08.455.127.144.048.256.096.336.144a.69.69 0 0 1 .24.2.43.43 0 0 1 .071.263v.375c0 .168-.064.256-.184.256a.83.83 0 0 1-.303-.096 3.652 3.652 0 0 0-1.532-.311c-.455 0-.815.071-1.062.223-.248.152-.375.383-.375.71 0 .224.08.416.24.567.159.152.454.304.877.44l1.134.358c.574.184.99.44 1.237.767.247.327.367.702.367 1.117 0 .343-.072.655-.207.926-.144.272-.336.511-.583.703-.248.2-.543.343-.886.447-.36.111-.734.167-1.142.167z"/>
+                        <path d="M2 2h9.5v9.5H2zM12.5 2H22v9.5h-9.5zM2 12.5h9.5V22H2zM12.5 12.5H22V22h-9.5z"/>
                     </svg>
                 </div>
-                <h4>AWS</h4>
-                <p>IAM, S3, SNS, and CloudTrail for complete identity workflows</p>
+                <h4>Microsoft Entra ID</h4>
+                <p>Entra ID, Key Vault, Blob Storage, and Graph mail for complete identity workflows</p>
             </div>
 
             <div class="tech-card">
@@ -612,7 +612,7 @@
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                     </svg>
                 </div>
-                <h4>CloudTrail</h4>
+                <h4>Entra Audit Logs</h4>
                 <p>Audit logging, retention, and compliance monitoring architecture</p>
             </div>
 
@@ -638,17 +638,17 @@
                     <div class="brand-avatar">MK</div>
                     <div class="brand-details">
                         <h4>Mohammad Jawad Khan</h4>
-                        <p>AWS Solutions Architect | IAM Specialist</p>
+                        <p>IT Specialist | IAM & Microsoft Security</p>
                     </div>
                 </div>
                 <p class="brand-bio">
-                    Building enterprise-grade identity management solutions with hands-on experience 
-                    in AWS, Active Directory, and automation scripting.
+                    Building enterprise-grade identity management solutions with hands-on experience
+                    in Microsoft Entra ID, Active Directory, and automation scripting.
                 </p>
                 <div class="brand-tags">
                     <span class="tag">📍 Houston, TX</span>
                     <span class="tag">🎓 University of Houston</span>
-                    <span class="tag">✓ AWS Certified</span>
+                    <span class="tag">✓ SC-300 exam Nov 2026</span>
                 </div>
             </div>
 

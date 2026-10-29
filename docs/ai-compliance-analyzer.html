@@ -79,33 +79,33 @@
     <script>
     const samples = {
         audit: `IAM Audit Report - Q4 2025
-Account: 123456789012 (Production)
+Tenant: contoso.onmicrosoft.com (Production)
 Audit Date: December 15, 2025
 Auditor: Mohammad Khan, IT Operations Specialist
 
 FINDINGS:
-1. User jsmith has not logged in for 90 days - recommend deprovisioning
-2. Service account svc-deploy has overly broad S3 permissions (s3:*)
-3. Root account MFA is enabled - COMPLIANT
-4. 3 users lack MFA enforcement on console access - NON-COMPLIANT
-5. CloudTrail logging is active across all regions - COMPLIANT
+1. User jsmith has not signed in for 90 days - recommend deprovisioning
+2. Service account svc-deploy has an overly broad directory role (Global Administrator)
+3. Emergency access accounts are defined and monitored - COMPLIANT
+4. 3 users have no MFA method registered - NON-COMPLIANT
+5. Entra audit and sign-in logs export to the archive - COMPLIANT
 6. Password policy meets CIS Benchmark requirements - COMPLIANT
 
 RISK ASSESSMENT: Medium - 2 non-compliant findings require remediation within 30 days
 RECOMMENDATION: Run dormant account detection script and restrict svc-deploy permissions`,
 
-        compliance: `CIS AWS Foundations Benchmark v1.4.0 - Compliance Summary
+        compliance: `CIS Microsoft 365 Foundations Benchmark v5.0.0 - Compliance Summary
 Organization: University of Houston - Student Data Systems
 Scan Date: 2025-12-20
 
 PASSED (18/22 controls):
-- 1.1 Avoid root account usage: PASS
-- 1.4 Rotate access keys within 90 days: PASS
-- 1.5 Enable MFA for IAM users: FAIL (3 users)
-- 2.1 CloudTrail enabled in all regions: PASS
-- 2.4 CloudTrail log validation enabled: PASS
-- 3.1 VPC Flow Logs enabled: PASS
-- 4.1 No security groups allow 0.0.0.0/0 to port 22: FAIL
+- 1.1.2 Two emergency access accounts defined: PASS
+- 1.1.3 Between two and four global admins designated: PASS
+- 5.2.2.2 MFA enabled for all users: FAIL (3 users)
+- 5.2.2.1 MFA enabled for administrative roles: PASS
+- 1.3.1 Password expiration set to never expire: PASS
+- 5.3.3 Access reviews for privileged roles configured: PASS
+- 5.3.2 Access reviews for guest users configured: FAIL
 
 OVERALL SCORE: 81.8% (18/22)
 FERPA ALIGNMENT: Satisfactory with noted exceptions
@@ -115,20 +115,20 @@ NEXT AUDIT: March 2026`,
 Incident ID: INC-2025-0847
 Severity: HIGH
 Detected: 2025-12-18 14:32 UTC
-Source: CloudTrail via EventBridge
+Source: Entra sign-in logs via Microsoft Sentinel
 
 SUMMARY: Multiple failed MFA authentication attempts detected for user admin@company.com from IP 203.0.113.42 (geolocation: outside corporate network). 12 failed attempts in 5-minute window followed by successful login without MFA from different IP 198.51.100.15.
 
 INDICATORS OF COMPROMISE:
 - Brute force pattern on MFA token
 - Successful login from unexpected IP after failures
-- Immediate privilege escalation attempt (iam:AttachRolePolicy)
+- Immediate privilege escalation attempt (Privileged Role Administrator assignment)
 
 RESPONSE ACTIONS:
 1. User credentials rotated immediately
 2. Session tokens revoked
 3. IP 203.0.113.42 added to WAF block list
-4. Full CloudTrail audit initiated for affected account`,
+4. Full Entra audit log review initiated for affected tenant`,
 
         provision: `USER PROVISIONING LOG
 Timestamp: 2025-12-19 09:15:00 UTC
@@ -138,14 +138,14 @@ Mode: Production
 BATCH PROVISIONING RESULTS:
 - Created user: registrar_analyst (Department: Registrar, Role: Analyst)
   -> AD: OU=Registrar,OU=Staff,DC=university,DC=edu
-  -> AWS: IAM user with StudentDataRestrictedAccess group
+  -> Entra ID: user added to StudentDataRestrictedAccess group
   -> MFA: Enforcement policy attached
-  -> Secrets: Credentials stored in AWS Secrets Manager (KMS encrypted)
+  -> Secrets: Credentials stored in Azure Key Vault (encrypted)
   -> Status: SUCCESS (completed in 12 seconds)
 
 - Created user: financial_aid_specialist (Department: FinAid, Role: Specialist)
   -> AD: OU=FinancialAid,OU=Staff,DC=university,DC=edu
-  -> AWS: IAM user with FinancialDataAccess group
+  -> Entra ID: user added to FinancialDataAccess group
   -> MFA: Enforcement policy attached
   -> Status: SUCCESS (completed in 14 seconds)
 
@@ -223,13 +223,13 @@ Compliance: All users have MFA enforcement, least-privilege access, and audit tr
 
     function extractEntities(text) {
         const patterns = [
-            { regex: /\b\d{12}\b/g, type: 'AWS Account' },
-            { regex: /\b(?:arn:aws:[a-z0-9-]+:[a-z0-9-]*:\d{12}:[^\s]+)/g, type: 'ARN' },
+            { regex: /\b[a-z0-9-]+\.onmicrosoft\.com\b/g, type: 'Tenant' },
+            { regex: /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, type: 'Object ID' },
             { regex: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, type: 'IP Address' },
             { regex: /\b[A-Z][a-z]+ [A-Z][a-z]+(?=,| -| \|)/g, type: 'Person' },
             { regex: /\b(?:University of Houston|Nagarro|NYCPS)\b/g, type: 'Organization' },
-            { regex: /\b(?:us-east-1|us-west-2|eu-west-1|eastus2)\b/g, type: 'AWS Region' },
-            { regex: /\b(?:CloudTrail|EventBridge|Lambda|DynamoDB|S3|IAM|VPC|RDS|KMS|SNS|MFA|AD)\b/g, type: 'AWS Service' },
+            { regex: /\b(?:eastus|eastus2|westus2|westeurope)\b/g, type: 'Azure Region' },
+            { regex: /\b(?:Entra ID|Entra|Sentinel|Key Vault|Intune|Defender|Graph|Conditional Access|IAM|MFA|AD)\b/g, type: 'Microsoft Service' },
             { regex: /\b(?:FERPA|HIPAA|CIS|SOX|PCI)\b/g, type: 'Compliance' },
             { regex: /\b[a-z_]+@[a-z.]+\b/g, type: 'Email/User' },
             { regex: /\b(?:INC-\d{4}-\d{4})\b/g, type: 'Incident ID' },
@@ -251,7 +251,7 @@ Compliance: All users have MFA enforcement, least-privilege access, and audit tr
             /(?:compliance|security|audit) (?:report|scan|check|finding|assessment)/gi,
             /(?:user|account) (?:provisioning|deprovisioning|lifecycle|lockout)/gi,
             /(?:encryption|encrypted) (?:at rest|in transit|storage|credentials)/gi,
-            /(?:CloudTrail|VPC Flow) (?:logging|logs|audit)/gi,
+            /(?:audit|sign-in) (?:logging|logs|log review)/gi,
             /(?:dormant|inactive) accounts?/gi,
             /(?:password|credential) (?:rotation|policy|complexity)/gi,
             /(?:incident|threat) (?:response|detection|investigation)/gi,

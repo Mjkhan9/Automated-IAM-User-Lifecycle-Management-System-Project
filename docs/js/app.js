@@ -393,28 +393,28 @@ function initializeProvisioningDemo() {
             { delay: 2600, text: '🔍 Validating user data...', color: '#F59E0B', prompt: true, progress: 50 },
             { delay: 3200, text: '✅ Validation passed', color: '#10B981', prompt: true, progress: 55 },
             { delay: 3600, text: '', prompt: false, progress: 60 },
-            { delay: 3800, text: '🔐 Creating AWS IAM user...', color: '#F59E0B', prompt: true, progress: 65 },
-            { delay: 4400, text: `✅ IAM user created: ${username}`, color: '#10B981', prompt: true, progress: 70 },
-            { delay: 4800, text: `   ARN: arn:aws:iam::123456789012:user/${username}`, color: '#6B7280', prompt: false, progress: 75 },
+            { delay: 3800, text: '🔐 Creating Microsoft Entra ID user...', color: '#F59E0B', prompt: true, progress: 65 },
+            { delay: 4400, text: `✅ Entra user created: ${username}`, color: '#10B981', prompt: true, progress: 70 },
+            { delay: 4800, text: `   UPN: ${username}@company.onmicrosoft.com`, color: '#6B7280', prompt: false, progress: 75 },
             { delay: 5200, text: '', prompt: false, progress: 78 },
-            { delay: 5400, text: '🔑 Generating access keys...', color: '#F59E0B', prompt: true, progress: 80 },
-            { delay: 6000, text: '✅ Access keys generated', color: '#10B981', prompt: true, progress: 82 },
-            { delay: 6300, text: '   Access Key ID: AKIAXXXXXXXXXXXXXXXX', color: '#6B7280', prompt: false, progress: 84 },
+            { delay: 5400, text: '🔑 Generating temporary password...', color: '#F59E0B', prompt: true, progress: 80 },
+            { delay: 6000, text: '✅ Password profile set', color: '#10B981', prompt: true, progress: 82 },
+            { delay: 6300, text: '   Change required at next sign-in', color: '#6B7280', prompt: false, progress: 84 },
             { delay: 6600, text: '', prompt: false, progress: 86 },
-            { delay: 6800, text: '📦 Storing credentials in S3...', color: '#F59E0B', prompt: true, progress: 88 },
-            { delay: 7400, text: `✅ Stored: s3://iam-credentials/${username}.json`, color: '#10B981', prompt: true, progress: 90 },
-            { delay: 7700, text: '   Encryption: AES-256-GCM', color: '#6B7280', prompt: false, progress: 92 },
+            { delay: 6800, text: '📦 Storing credentials in Azure Key Vault...', color: '#F59E0B', prompt: true, progress: 88 },
+            { delay: 7400, text: `✅ Stored: keyvault:iam-credentials-${department}-${username}`, color: '#10B981', prompt: true, progress: 90 },
+            { delay: 7700, text: '   Encryption: Key Vault (AES-256)', color: '#6B7280', prompt: false, progress: 92 },
             { delay: 8000, text: '', prompt: false, progress: 93 },
             { delay: 8200, text: `👥 Adding to Department-${department} group...`, color: '#F59E0B', prompt: true, progress: 94 },
             { delay: 8800, text: `✅ Group membership assigned`, color: '#10B981', prompt: true, progress: 95 },
             { delay: 9100, text: '', prompt: false, progress: 96 },
-            { delay: 9300, text: `🔒 Attaching policy: ${getRolePolicy(role)}`, color: '#F59E0B', prompt: true, progress: 97 },
-            { delay: 9900, text: '✅ Policy attached successfully', color: '#10B981', prompt: true, progress: 98 },
+            { delay: 9300, text: `🔒 Assigning directory role: ${getRolePolicy(role)}`, color: '#F59E0B', prompt: true, progress: 97 },
+            { delay: 9900, text: '✅ Role assigned successfully', color: '#10B981', prompt: true, progress: 98 },
             { delay: 10200, text: '', prompt: false, progress: 99 },
-            { delay: 10400, text: '📧 Sending SNS notification...', color: '#F59E0B', prompt: true, progress: 99 },
-            { delay: 11000, text: '✅ Manager notified via SNS', color: '#10B981', prompt: true, progress: 100 },
+            { delay: 10400, text: '📧 Sending Microsoft Graph mail notification...', color: '#F59E0B', prompt: true, progress: 99 },
+            { delay: 11000, text: '✅ Manager notified via Graph sendMail', color: '#10B981', prompt: true, progress: 100 },
             { delay: 11300, text: '', prompt: false, progress: 100 },
-            { delay: 11500, text: '📊 Writing to CloudTrail...', color: '#F59E0B', prompt: true, progress: 100 },
+            { delay: 11500, text: '📊 Recording in Entra audit logs...', color: '#F59E0B', prompt: true, progress: 100 },
             { delay: 12100, text: '✅ Audit event logged', color: '#10B981', prompt: true, progress: 100 },
             { delay: 12400, text: '', prompt: false, progress: 100 },
             { delay: 12600, text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', color: '#10B981', prompt: false, progress: 100 },
@@ -562,13 +562,13 @@ function showFinalDemoState(formData, consoleEl, progressBar, progressText) {
 // ========================================
 function getRolePolicy(role) {
     const policies = {
-        'Developer': 'PowerUserAccess',
-        'Analyst': 'ReadOnlyAccess',
-        'Admin': 'AdministratorAccess',
-        'Manager': 'ViewOnlyAccess',
-        'Executive': 'ExecutiveAccess'
+        'Developer': 'Application Developer',
+        'Analyst': 'Global Reader',
+        'Admin': 'Global Administrator',
+        'Manager': 'Reports Reader',
+        'Executive': 'Reports Reader'
     };
-    return policies[role] || 'ReadOnlyAccess';
+    return policies[role] || 'Global Reader';
 }
 
 function clearConsole() {
@@ -639,8 +639,8 @@ function showFeatureDetails(feature) {
         case 'audit':
             showAuditLogs();
             break;
-        case 'aws':
-            showAWSIntegration();
+        case 'entra':
+            showEntraIntegration();
             break;
         default:
             showToast('Coming soon', 'Feature details will be available soon!', 'info');
@@ -747,19 +747,19 @@ function showAuditLogs() {
         <div class="audit-log-entry">
             <div class="audit-log-time">2024-11-17 14:23:45 UTC</div>
             <div class="audit-log-action">User Provisioned: john.doe@company.com</div>
-            <div class="audit-log-details">Created IAM user with Developer role in IT department. Access keys generated and stored in S3. Manager notification sent via SNS.</div>
+            <div class="audit-log-details">Created Entra user with Developer role in IT department. Temporary password stored in Key Vault. Manager notification sent via Graph sendMail.</div>
         </div>
         
         <div class="audit-log-entry">
             <div class="audit-log-time">2024-11-17 13:15:22 UTC</div>
-            <div class="audit-log-action">Policy Attached: sarah.johnson@company.com</div>
-            <div class="audit-log-details">Attached PowerUserAccess policy. Modified by: admin@company.com. Reason: Role change to Senior Developer.</div>
+            <div class="audit-log-action">Role Assigned: sarah.johnson@company.com</div>
+            <div class="audit-log-details">Assigned Application Developer role. Modified by: admin@company.com. Reason: Role change to Senior Developer.</div>
         </div>
         
         <div class="audit-log-entry">
             <div class="audit-log-time">2024-11-17 11:45:10 UTC</div>
             <div class="audit-log-action">Account Deactivated: mike.davis@company.com</div>
-            <div class="audit-log-details">Account disabled due to employment termination. Access keys revoked. Data archived to S3://compliance-archive/2024/11/.</div>
+            <div class="audit-log-details">Account disabled due to employment termination. Sessions revoked. Data archived to the compliance-archive container (2024/11/).</div>
         </div>
         
         <div class="audit-log-entry">
@@ -776,13 +776,13 @@ function showAuditLogs() {
         
         <div class="audit-log-entry">
             <div class="audit-log-time">2024-11-17 08:05:18 UTC</div>
-            <div class="audit-log-action">Access Key Rotated: system-service-account</div>
-            <div class="audit-log-details">Automated key rotation completed. Old key deactivated. New key stored securely. Next rotation: 2025-02-17.</div>
+            <div class="audit-log-action">Client Secret Rotated: system-service-account</div>
+            <div class="audit-log-details">Automated secret rotation completed. Old secret removed. New secret stored in Key Vault. Next rotation: 2025-02-17.</div>
         </div>
         
         <p style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.875rem;">
-            📊 All audit logs are encrypted and stored in S3 with 7-year retention for compliance.
-            CloudTrail integration provides complete forensic analysis capabilities.
+            📊 All audit logs are encrypted and archived to Azure Blob Storage with 7-year retention for compliance.
+            Entra audit and sign-in logs provide complete forensic analysis capabilities.
         </p>
     `);
     showModal(modal);
@@ -804,7 +804,7 @@ function showDeprovisionWorkflow() {
             <div class="workflow-step-number">2</div>
             <div class="workflow-step-content">
                 <h4>Account Suspension</h4>
-                <p>User account is immediately disabled in Active Directory and AWS IAM. Login access is revoked across all systems. Existing sessions are terminated within 15 minutes.</p>
+                <p>User account is immediately disabled in Active Directory and Microsoft Entra ID. Login access is revoked across all systems. Existing sessions are terminated within 15 minutes.</p>
             </div>
         </div>
         
@@ -812,7 +812,7 @@ function showDeprovisionWorkflow() {
             <div class="workflow-step-number">3</div>
             <div class="workflow-step-content">
                 <h4>Access Revocation</h4>
-                <p>All AWS access keys are deactivated. Group memberships are removed. IAM policies are detached. VPN and network access is revoked immediately.</p>
+                <p>All sign-in sessions are revoked. Group memberships are removed. Directory roles are unassigned. VPN and network access is revoked immediately.</p>
             </div>
         </div>
         
@@ -820,7 +820,7 @@ function showDeprovisionWorkflow() {
             <div class="workflow-step-number">4</div>
             <div class="workflow-step-content">
                 <h4>Data Archival</h4>
-                <p>User data is backed up to S3 with AES-256 encryption. Home directory contents, email archives, and project files are preserved for 7 years per compliance requirements.</p>
+                <p>User data is backed up to Azure Blob Storage with AES-256 encryption. Home directory contents, email archives, and project files are preserved for 7 years per compliance requirements.</p>
             </div>
         </div>
         
@@ -828,7 +828,7 @@ function showDeprovisionWorkflow() {
             <div class="workflow-step-number">5</div>
             <div class="workflow-step-content">
                 <h4>Notification & Audit</h4>
-                <p>Manager receives notification via SNS. IT Security team is alerted. Complete audit trail is logged to CloudTrail. Exit checklist is generated for final review.</p>
+                <p>Manager receives notification via Graph sendMail. IT Security team is alerted. Complete audit trail is recorded in Entra audit logs. Exit checklist is generated for final review.</p>
             </div>
         </div>
         
@@ -854,33 +854,33 @@ function showDeprovisionWorkflow() {
     showModal(modal);
 }
 
-function showAWSIntegration() {
-    const modal = createModal('AWS Service Integration', `
+function showEntraIntegration() {
+    const modal = createModal('Microsoft Entra ID Integration', `
         <div class="dashboard-grid">
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
-                    <span class="dashboard-card-title">AWS IAM</span>
+                    <span class="dashboard-card-title">Microsoft Entra ID</span>
                 </div>
-                <div class="dashboard-card-label" style="margin-top: 1rem;">User and policy management, role-based access control, credential generation</div>
+                <div class="dashboard-card-label" style="margin-top: 1rem;">User and directory role management, role-based access control, credential generation</div>
             </div>
-            
+
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
-                    <span class="dashboard-card-title">Amazon S3</span>
+                    <span class="dashboard-card-title">Azure Key Vault</span>
                 </div>
                 <div class="dashboard-card-label" style="margin-top: 1rem;">Encrypted credential storage, data archival, compliance retention</div>
             </div>
-            
+
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
-                    <span class="dashboard-card-title">AWS SNS</span>
+                    <span class="dashboard-card-title">Graph sendMail</span>
                 </div>
                 <div class="dashboard-card-label" style="margin-top: 1rem;">Real-time notifications, alert distribution, workflow triggers</div>
             </div>
-            
+
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
-                    <span class="dashboard-card-title">CloudTrail</span>
+                    <span class="dashboard-card-title">Entra Audit Logs</span>
                 </div>
                 <div class="dashboard-card-label" style="margin-top: 1rem;">Complete audit logging, forensic analysis, compliance reporting</div>
             </div>
@@ -889,28 +889,28 @@ function showAWSIntegration() {
         <h4 style="margin: 2rem 0 1rem; color: var(--text-primary); font-size: 1.25rem;">Integration Architecture</h4>
         
         <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-            <strong style="color: var(--text-primary);">IAM Provisioning Flow:</strong>
+            <strong style="color: var(--text-primary);">Entra Provisioning Flow:</strong>
             <p style="margin-top: 0.75rem; color: var(--text-secondary); line-height: 1.6;">
-                Python/PowerShell scripts → AWS SDK (Boto3) → IAM User Creation → Policy Attachment → 
-                Access Key Generation → S3 Encryption → SNS Notification → CloudTrail Logging
+                Python/PowerShell scripts → Microsoft Graph → Entra User Creation → Role Assignment →
+                Temporary Password → Key Vault Storage → Graph Mail Notification → Entra Audit Logs
             </p>
         </div>
         
         <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
             <strong style="color: var(--text-primary);">Security Features:</strong>
             <ul style="margin-top: 0.75rem; margin-left: 1.25rem; color: var(--text-secondary); line-height: 1.6;">
-                <li>AES-256-GCM encryption for all stored credentials</li>
-                <li>S3 bucket policies with least-privilege access</li>
-                <li>IAM roles for service-to-service authentication</li>
-                <li>CloudTrail logs encrypted and immutable</li>
-                <li>SNS topic encryption with KMS keys</li>
+                <li>Key Vault encryption for all stored credentials</li>
+                <li>Key Vault and Storage RBAC with least-privilege access</li>
+                <li>Managed identity for service-to-service authentication</li>
+                <li>Audit archive encrypted, with time-based retention</li>
+                <li>Graph mail sent from a dedicated automation mailbox</li>
             </ul>
         </div>
         
         <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px;">
             <strong style="color: var(--text-primary);">Compliance & Audit:</strong>
             <p style="margin-top: 0.75rem; color: var(--text-secondary); line-height: 1.6;">
-                7-year retention in S3 Glacier for long-term compliance. CloudTrail provides complete 
+                7-year retention in the Blob Storage archive tier for long-term compliance. Entra audit logs provide complete
                 forensic audit trails. Automated compliance reports generated monthly. SOC 2, HIPAA, 
                 and GDPR compliant architecture.
             </p>

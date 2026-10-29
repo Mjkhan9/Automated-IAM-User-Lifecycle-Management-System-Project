@@ -50,9 +50,9 @@ stages:
     dependsOn: PythonTests
     jobs:
       - job: Audit
-        displayName: 'CloudFormation Security Check'
+        displayName: 'Bicep Security Check'
         steps:
           - script: |
               pip install checkov
-              checkov -f deploy/cloudformation/iam-platform-stack.yaml --framework cloudformation --soft-fail
-            displayName: 'Checkov CloudFormation Scan'
+              checkov -f deploy/bicep/main.bicep --framework bicep --soft-fail
+            displayName: 'Checkov Bicep Scan'

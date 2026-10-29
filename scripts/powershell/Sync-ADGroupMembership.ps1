@@ -59,8 +59,8 @@ $RBACMatrix = @{
     "HR|*"              = @("SG-HR-Users")
     
     # Engineering Department
-    "Engineering|Developer"  = @("SG-Engineering-Users", "SG-DevTools", "SG-SourceControl", "SG-AWS-Dev")
-    "Engineering|Lead"       = @("SG-Engineering-Users", "SG-DevTools", "SG-SourceControl", "SG-AWS-Dev", "SG-Managers")
+    "Engineering|Developer"  = @("SG-Engineering-Users", "SG-DevTools", "SG-SourceControl", "SG-Azure-Dev")
+    "Engineering|Lead"       = @("SG-Engineering-Users", "SG-DevTools", "SG-SourceControl", "SG-Azure-Dev", "SG-Managers")
     "Engineering|*"          = @("SG-Engineering-Users", "SG-SourceControl")
     
     # Default

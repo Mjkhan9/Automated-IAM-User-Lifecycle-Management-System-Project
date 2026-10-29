@@ -2,7 +2,7 @@
 
 ## System Architecture Overview
 
-This document describes the architecture of the IAM Lifecycle Automation Platform, including data flows, components, and security boundaries.
+This document describes the architecture of the IAM Lifecycle Automation Platform (Microsoft Entra ID edition), including data flows, components, and security boundaries.
 
 ## Architecture Diagram
 
@@ -27,33 +27,33 @@ flowchart TB
         FS["📂 File Server<br/>(Home Directories)"]
     end
 
-    subgraph AWS["AWS Cloud (VPC)"]
+    subgraph Azure["Microsoft Cloud (Entra ID + Azure)"]
         subgraph Compute["Compute Layer"]
-            PY["🐍 Python Boto3 Scripts<br/>• iam_provisioner.py<br/>• compliance_audit.py"]
-            LAMBDA["λ Lambda Functions<br/>(Optional)"]
+            PY["🐍 Python Microsoft Graph Scripts<br/>• entra_provisioner.py<br/>• compliance_audit.py"]
+            FUNC["⚡ Azure Functions<br/>(Optional)"]
         end
         
-        subgraph IAM_SVC["IAM Services"]
-            IAMU["👤 IAM Users"]
-            IAMG["👥 IAM Groups"]
-            IAMP["📜 IAM Policies"]
-            IAMR["🔐 IAM Roles"]
+        subgraph ENTRA_SVC["Entra ID Services"]
+            ENU["👤 Entra Users"]
+            ENG["👥 Security Groups"]
+            ENP["📜 RBAC Directory Roles"]
+            ENR["🔐 Managed Identity"]
         end
         
         subgraph Storage["Storage & Secrets"]
-            SM["🔑 Secrets Manager<br/>(Credentials)"]
-            S3["📦 S3 Bucket<br/>(Audit Archives)"]
+            KV["🔑 Azure Key Vault<br/>(Credentials)"]
+            BLOB["📦 Blob Storage<br/>(Audit Archives)"]
         end
         
         subgraph Messaging["Messaging & Audit"]
-            SNS["📢 SNS Topics<br/>(Notifications)"]
-            CT["📊 CloudTrail<br/>(Audit Logs)"]
-            CW["📈 CloudWatch<br/>(Monitoring)"]
+            MAIL["📢 Graph sendMail<br/>(Notifications)"]
+            AL["📊 Entra Audit Logs<br/>(Audit Logs)"]
+            MON["📈 Azure Monitor<br/>(Monitoring)"]
         end
         
         subgraph Security["Security Layer"]
-            KMS["🔐 KMS<br/>(Encryption Keys)"]
-            SG["🛡️ Security Groups"]
+            KVK["🔐 Key Vault RBAC<br/>(Access Control)"]
+            CA["🛡️ Conditional Access"]
         end
     end
 
@@ -69,34 +69,34 @@ flowchart TB
     PS -->|"2. Manage Groups"| ADOU
     PS -->|"3. Create Home Dir"| FS
     
-    PS -->|"4. Trigger AWS Provisioning"| PY
-    PY -->|"5. Create IAM User"| IAMU
-    PY -->|"5. Assign Groups"| IAMG
-    PY -->|"5. Attach Policies"| IAMP
+    PS -->|"4. Trigger Entra Provisioning"| PY
+    PY -->|"5. Create Entra User"| ENU
+    PY -->|"5. Assign Groups"| ENG
+    PY -->|"5. Assign Roles"| ENP
     
-    PY -->|"6. Store Credentials"| SM
-    SM -->|"Encrypted by"| KMS
+    PY -->|"6. Store Credentials"| KV
+    KV -->|"Protected by"| KVK
     
-    PY -->|"7. Send Notification"| SNS
-    SNS -->|"8. Alert"| EMAIL
+    PY -->|"7. Send Notification"| MAIL
+    MAIL -->|"8. Alert"| EMAIL
     
-    PY -->|"9. Log Actions"| CT
-    CT -->|"Archive"| S3
-    S3 -->|"Encrypted by"| KMS
+    PY -->|"9. Actions logged"| AL
+    AL -->|"Archive"| BLOB
+    BLOB -->|"Accessed via"| ENR
     
     FLASK -->|"View Status"| PY
-    FLASK -->|"View Logs"| CT
+    FLASK -->|"View Logs"| AL
 
     %% Styling
-    classDef aws fill:#FF9900,stroke:#232F3E,color:#232F3E
-    classDef onprem fill:#0078D4,stroke:#002050,color:white
+    classDef cloud fill:#0078D4,stroke:#002050,color:white
+    classDef onprem fill:#5C2D91,stroke:#2E1648,color:white
     classDef security fill:#DD3522,stroke:#8B0000,color:white
     classDef external fill:#6B7280,stroke:#374151,color:white
     
     class HR,EMAIL external
     class ADC,ADOU,ADGP,PS,FS onprem
-    class IAMU,IAMG,IAMP,IAMR,SM,S3,SNS,CT,CW,LAMBDA,PY aws
-    class KMS,SG security
+    class ENU,ENG,ENP,ENR,KV,BLOB,MAIL,AL,MON,FUNC,PY cloud
+    class KVK,CA security
 ```
 
 ## Component Details
@@ -115,24 +115,24 @@ flowchart TB
 | `Get-DormantAccounts.ps1` | Identify inactive accounts for compliance |
 | `Sync-ADGroupMembership.ps1` | Synchronize group memberships based on roles |
 
-### 3. Python Boto3 Scripts (AWS)
+### 3. Python Microsoft Graph Scripts (Entra ID)
 
 | Script | Purpose |
 |--------|---------|
-| `iam_provisioner.py` | Create IAM users, assign groups, attach policies |
+| `entra_provisioner.py` | Create Entra users, add security groups, assign directory roles |
 | `compliance_audit.py` | CIS benchmark checks, credential age analysis |
 
-### 4. AWS Services
+### 4. Microsoft Entra ID and Azure Services
 
 | Service | Purpose |
 |---------|---------|
-| **IAM** | User/group/policy management |
-| **Secrets Manager** | Secure credential storage with rotation |
-| **S3** | Audit log archival with 7-year retention |
-| **SNS** | Real-time notifications to managers |
-| **CloudTrail** | Complete audit trail of all IAM actions |
-| **KMS** | Encryption key management |
-| **CloudWatch** | Monitoring and alerting |
+| **Microsoft Entra ID** | User/group/directory role management |
+| **Azure Key Vault** | Secure credential storage with versioning |
+| **Blob Storage** | Audit log archival with 7-year retention |
+| **Microsoft Graph sendMail** | Real-time notifications to managers |
+| **Entra audit and sign-in logs** | Complete audit trail of all identity actions |
+| **Managed identity** | Credential-free access to Key Vault and Storage |
+| **Azure Monitor** | Monitoring and alerting |
 
 ## Data Flow Sequence
 
@@ -141,58 +141,58 @@ sequenceDiagram
     participant HR as HR System
     participant PS as PowerShell
     participant AD as Active Directory
-    participant PY as Python/Boto3
-    participant IAM as AWS IAM
-    participant SM as Secrets Manager
-    participant SNS as SNS
-    participant CT as CloudTrail
+    participant PY as Python/Graph
+    participant ENTRA as Entra ID
+    participant KV as Key Vault
+    participant MAIL as Graph sendMail
+    participant AL as Entra Audit Logs
 
     HR->>PS: 1. New hire notification
     PS->>AD: 2. Create AD account
     PS->>AD: 3. Add to security groups
     PS->>PS: 4. Create home directory
-    PS->>PY: 5. Trigger AWS provisioning
-    PY->>IAM: 6. Create IAM user
-    PY->>IAM: 7. Assign to IAM groups
-    PY->>IAM: 8. Attach managed policies
-    PY->>SM: 9. Store credentials (encrypted)
-    PY->>SNS: 10. Send notification
-    SNS-->>HR: 11. Email to manager
-    PY->>CT: 12. Log audit event
-    CT-->>CT: 13. Archive to S3
+    PS->>PY: 5. Trigger Entra provisioning
+    PY->>ENTRA: 6. Create Entra user
+    PY->>ENTRA: 7. Add to security groups
+    PY->>ENTRA: 8. Assign directory roles
+    PY->>KV: 9. Store credentials (encrypted)
+    PY->>MAIL: 10. Send notification
+    MAIL-->>HR: 11. Email to manager
+    ENTRA->>AL: 12. Record audit event
+    AL-->>AL: 13. Archive to Blob Storage
 ```
 
 ## Security Boundaries
 
 ### Network Security
-- **VPC**: All AWS resources in private VPC
-- **Security Groups**: Restrict inbound/outbound traffic
-- **NACLs**: Additional network layer security
+- **Key Vault firewall**: Trusted Azure services bypass, deny-by-default available
+- **Storage**: HTTPS only, no public blob access, TLS 1.2 minimum
+- **Conditional Access**: Sign-in conditions for the automation and admin accounts
 
 ### Identity Security
 - **Least Privilege**: Minimal permissions per role
-- **MFA Required**: For all console access
-- **Password Policy**: 90-day rotation, complexity requirements
+- **MFA Required**: Audited for every user who signs in
+- **Password Policy**: Temporary password, change required at next sign-in
 
 ### Data Security
-- **Encryption at Rest**: S3, Secrets Manager via KMS
+- **Encryption at Rest**: Key Vault and Blob Storage (Microsoft-managed keys)
 - **Encryption in Transit**: TLS 1.2+ for all communications
-- **Key Rotation**: Automatic annual KMS key rotation
+- **Secret Versioning**: Every credential write is a new Key Vault secret version
 
 ### Audit & Compliance
-- **CloudTrail**: All API calls logged
+- **Entra audit logs**: All directory changes logged
 - **Retention**: 7-year log retention for compliance
-- **Immutability**: Log file validation enabled
+- **Immutability**: Time-based retention on the archive container in production
 
-## AWS Well-Architected Alignment
+## Microsoft Well-Architected Alignment
 
 | Pillar | Implementation |
 |--------|----------------|
-| **Security** | KMS encryption, least-privilege IAM, Secrets Manager |
-| **Reliability** | Multi-AZ deployment, retry logic, error handling |
+| **Security** | Key Vault RBAC, least-privilege directory roles, managed identity |
+| **Reliability** | Zone-redundant options, retry logic, error handling |
 | **Cost Optimization** | Serverless components, lifecycle policies |
-| **Operational Excellence** | CloudTrail, CloudWatch, automated responses |
-| **Performance** | Async SNS notifications, efficient API usage |
+| **Operational Excellence** | Entra audit logs, Azure Monitor, automated responses |
+| **Performance** | Graph batching-ready calls, efficient API usage |
 | **Sustainability** | Right-sized resources, lifecycle policies |
 
 ## Deployment Architecture
@@ -200,21 +200,21 @@ sequenceDiagram
 ```mermaid
 flowchart LR
     subgraph Dev["Development"]
-        DEV_CFN["CloudFormation Stack"]
-        DEV_IAM["IAM Resources"]
-        DEV_S3["S3 Bucket"]
+        DEV_BICEP["Bicep Deployment"]
+        DEV_KV["Key Vault"]
+        DEV_ST["Storage Account"]
     end
     
     subgraph Staging["Staging"]
-        STG_CFN["CloudFormation Stack"]
-        STG_IAM["IAM Resources"]
-        STG_S3["S3 Bucket"]
+        STG_BICEP["Bicep Deployment"]
+        STG_KV["Key Vault"]
+        STG_ST["Storage Account"]
     end
     
     subgraph Prod["Production"]
-        PROD_CFN["CloudFormation Stack"]
-        PROD_IAM["IAM Resources"]
-        PROD_S3["S3 Bucket"]
+        PROD_BICEP["Bicep Deployment"]
+        PROD_KV["Key Vault"]
+        PROD_ST["Storage Account"]
     end
     
     GH["GitHub Actions<br/>CI/CD Pipeline"] --> Dev
@@ -226,16 +226,16 @@ flowchart LR
 
 | Service | Monthly Cost (Estimated) |
 |---------|-------------------------|
-| IAM | Free (within limits) |
-| S3 (credentials + logs) | ~$0.50 |
-| Secrets Manager | ~$0.40 per secret |
-| SNS | ~$0.50 (1000 notifications) |
-| CloudTrail | First trail free |
-| KMS | ~$1.00 per key |
-| **Total** | **~$2-5/month** |
+| Microsoft Entra ID | Included (sign-in activity needs P1) |
+| Blob Storage (audit archive) | Cents per GB |
+| Azure Key Vault | ~$0.03 per 10,000 operations |
+| Microsoft Graph sendMail | Included with an Exchange Online mailbox |
+| Entra audit logs | Included |
+| Managed identity | Free |
+| **Total** | **Under $1/month** |
 
 ---
 
-*Last Updated: December 2024*
+*Last Updated: October 2026*
 *Author: Mohammad Khan*
 

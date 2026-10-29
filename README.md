@@ -1,18 +1,20 @@
-# IAM Lifecycle Automation Platform
+# Hybrid IAM User Lifecycle Automation (Active Directory + Microsoft Entra ID)
 
-[![AWS](https://img.shields.io/badge/AWS-IAM%20|%20CloudFormation-FF9900?logo=amazon-aws)](https://aws.amazon.com/) [![Python](https://img.shields.io/badge/Python-3.9%2B-3776ab?logo=python)](https://www.python.org/) [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE?logo=powershell)](https://learn.microsoft.com/powershell/)
+[![Microsoft Entra ID](https://img.shields.io/badge/Microsoft%20Entra%20ID-Microsoft%20Graph%20|%20Bicep-0078D4?logo=microsoft)](https://learn.microsoft.com/entra/identity/) [![Python](https://img.shields.io/badge/Python-3.9%2B-3776ab?logo=python)](https://www.python.org/) [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE?logo=powershell)](https://learn.microsoft.com/powershell/)
 
 > **Solving the user provisioning nightmare:** From 4+ hours per user to minutes of automation
 
-Identity and Access Management automation for hybrid Active Directory and AWS environments.
+Identity and Access Management automation for hybrid Active Directory and Microsoft Entra ID environments.
 
-## The Problem I Solved
+> History: the original AWS version of this project is preserved at tag [`v1-aws`](https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project/tree/v1-aws).
 
-At my current role managing 150-200+ monthly incidents, I was manually provisioning users:
+## The Problem
+
+User provisioning was manual and repeated across two directories:
 
 1. **Active Directory** - Create account, set OU, configure security groups (1-2 hours)
-2. **AWS IAM** - Duplicate the entire process in AWS (1-2 hours)
-3. **Permissions** - Configure role-based policies and access levels (1 hour)
+2. **Microsoft Entra ID** - Repeat the process for the cloud identity (1-2 hours)
+3. **Permissions** - Configure role-based access and directory roles (1 hour)
 4. **Documentation** - Log everything for compliance (30 min)
 
 **Total: 4+ hours per user. Error-prone. Repetitive at scale.**
@@ -29,7 +31,7 @@ Handles the **complete user lifecycle** automatically:
 
 | Phase | What Happens | Time Saved |
 |-------|--------------|-----------|
-| **Provisioning** | Creates users in AD + AWS with role-based permissions | 3.5 hours |
+| **Provisioning** | Creates users in AD + Entra ID with role-based permissions | 3.5 hours |
 | **De-provisioning** | Secure offboarding with data archival and revocation | 2 hours |
 | **Compliance** | Continuous CIS Benchmark checks and dormant account detection | 1 hour/month |
 | **Audit Trail** | 7-year retention logs for regulatory compliance | Automatic |
@@ -53,27 +55,27 @@ Handles the **complete user lifecycle** automatically:
 │        │                     │       └─ Assign groups              │
 │        │                     │                                      │
 │        ▼                     │                                      │
-│  Python/Boto3 Scripts ──────┼─────▶ AWS IAM                        │
+│  Python/Microsoft Graph ────┼─────▶ Microsoft Entra ID             │
 │        │                    │       ├─ Create user                 │
-│        │                    │       ├─ Attach policies             │
-│        │                    │       └─ Setup console access        │
+│        │                    │       ├─ Assign RBAC roles           │
+│        │                    │       └─ Add security groups         │
 │        │                    │                                      │
 │        ▼                    │                                      │
-│  Secrets Manager ───────────┼─────▶ Credentials (Encrypted)        │
+│  Azure Key Vault ───────────┼─────▶ Credentials (Encrypted)        │
 │        │                    │                                      │
 │        ▼                    │                                      │
-│  SNS Notifications ─────────┼─────▶ Manager Approval               │
+│  Graph sendMail ────────────┼─────▶ Manager Approval               │
 │        │                    │                                      │
 │        ▼                    │                                      │
-│  CloudTrail Logging ────────┴─────▶ Compliance Audit Trail         │
+│  Entra Audit Logs ──────────┴─────▶ Compliance Audit Trail         │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Hybrid Architecture:**
 - **On-Premises:** PowerShell scripts manage Active Directory
-- **Cloud:** Python/Boto3 handles AWS IAM seamlessly
-- **Security:** Secrets Manager for encrypted credential storage (KMS encryption managed by AWS)
+- **Cloud:** Python and Microsoft Graph handle Entra ID users, groups and directory roles
+- **Security:** Azure Key Vault for encrypted credential storage (RBAC authorization, soft delete)
 
 ### Component Breakdown
 
@@ -83,15 +85,16 @@ Handles the **complete user lifecycle** automatically:
 - `Get-DormantAccounts.ps1` - Finds inactive accounts for deprovisioning review
 - `Sync-ADGroupMembership.ps1` - Keeps group memberships in sync with HR data
 
-**AWS IAM Automation (Python/Boto3)**
-- `iam_provisioner.py` - Creates IAM users with least-privilege policies based on role
-- `compliance_audit.py` - Runs automated CIS Benchmark compliance checks
-- Uses IAM, S3, SNS, and Secrets Manager clients for provisioning workflows
+**Microsoft Entra ID Automation (Python/Microsoft Graph)**
+- `entra_provisioner.py` - Creates Entra users with least-privilege directory roles based on role
+- `compliance_audit.py` - Runs automated CIS Microsoft 365 Foundations Benchmark checks
+- Uses Microsoft Graph (REST), Azure Key Vault and Azure Blob Storage clients for provisioning workflows
 
-**Infrastructure (CloudFormation)**
-- Deploys Secrets Manager for encrypted credential storage (AWS-managed KMS encryption)
-- Sets up SNS topics for manager notifications and alerts
-- Configures CloudTrail with S3 logging for audit trails
+**Infrastructure (Bicep)**
+- Deploys Azure Key Vault for encrypted credential storage
+- Deploys a Storage account for the audit log archive (archive tier, 7-year retention)
+- Creates a managed identity for the automation, with least-privilege role assignments
+- Notifications use Microsoft Graph sendMail (no extra resource); audit data comes from Microsoft Entra audit and sign-in logs
 
 **Note:** This is a CLI-based automation system. A Flask-based web console is planned for future enhancement.
 
@@ -101,7 +104,8 @@ Handles the **complete user lifecycle** automatically:
 
 ### Prerequisites
 
-- AWS CLI configured with appropriate IAM permissions
+- Azure CLI signed in to the target subscription
+- An Entra app registration or managed identity with Microsoft Graph application permissions: `User.ReadWrite.All`, `Group.ReadWrite.All`, `RoleManagement.ReadWrite.Directory`, `Mail.Send`, `AuditLog.Read.All` (sign-in activity needs Microsoft Entra ID P1)
 - Python 3.9+ with pip
 - PowerShell 5.1+ (for Active Directory scripts)
 - Active Directory access (for on-premises integration)
@@ -113,18 +117,17 @@ Handles the **complete user lifecycle** automatically:
 git clone https://github.com/Mjkhan9/Automated-IAM-User-Lifecycle-Management-System-Project.git
 cd Automated-IAM-User-Lifecycle-Management-System-Project
 
-# Deploy AWS infrastructure
-aws cloudformation deploy \
-    --template-file deploy/cloudformation/iam-platform-stack.yaml \
-    --stack-name iam-automation-platform \
-    --parameter-overrides Environment=dev NotificationEmail=your@email.com \
-    --capabilities CAPABILITY_NAMED_IAM
+# Deploy Azure infrastructure
+az deployment group create \
+    --resource-group rg-iam-automation \
+    --template-file deploy/bicep/main.bicep \
+    --parameters environment=dev
 
 # Install Python dependencies
 pip install -r requirements.txt
 
 # Run provisioning demo
-python scripts/python/iam_provisioner.py
+python scripts/python/entra_provisioner.py
 ```
 
 ### Run Compliance Audit
@@ -139,8 +142,8 @@ python scripts/python/compliance_audit.py
 
 ```
 deploy/
-├── cloudformation/
-│   └── iam-platform-stack.yaml         # AWS infrastructure as code
+├── bicep/
+│   └── main.bicep                      # Azure infrastructure as code
 ├── docs/                               # Interactive portfolio site
 │   ├── index.html
 │   ├── architecture.md
@@ -150,7 +153,7 @@ deploy/
 │       └── architecture.svg
 ├── scripts/
 │   ├── python/
-│   │   ├── iam_provisioner.py         # AWS IAM automation
+│   │   ├── entra_provisioner.py       # Microsoft Entra ID automation
 │   │   ├── compliance_audit.py        # CIS benchmark checks
 │   │   └── requirements.txt           # Python dependencies
 │   └── powershell/
@@ -160,7 +163,7 @@ deploy/
 │       └── Sync-ADGroupMembership.ps1
 ├── tests/
 │   ├── python/
-│   │   ├── test_iam_provisioner.py
+│   │   ├── test_entra_provisioner.py
 │   │   └── test_compliance_audit.py
 │   └── powershell/
 │       └── New-ADUserProvision.Tests.ps1
@@ -177,14 +180,14 @@ deploy/
 ## Key Features
 
 ### ✅ Security by Design
-- **Encryption at Rest:** AWS-managed KMS encryption for Secrets Manager, S3, CloudTrail
+- **Encryption at Rest:** Azure Key Vault and Azure Storage encryption (Microsoft-managed keys)
 - **Encryption in Transit:** TLS 1.2+ for all API calls
 - **Least Privilege:** Users only get minimum permissions for their role
-- **MFA Enforcement:** All console access requires multi-factor authentication
-- **Audit Everything:** CloudTrail logs every API call (7-year retention)
+- **MFA Enforcement:** The compliance audit flags any user who signs in without a registered MFA method
+- **Audit Everything:** Microsoft Entra audit and sign-in logs, archived to Storage (7-year retention)
 
 ### ✅ Compliance Built-In
-- **CIS AWS Foundations Benchmark** automated checks
+- **CIS Microsoft 365 Foundations Benchmark** automated checks
 - **FERPA compliant** (education data isolation)
 - **HIPAA compatible** (encryption, audit trails)
 - **SOX audit-ready** (complete access logs)
@@ -220,9 +223,9 @@ Invoke-Pester tests/powershell/ -Output Detailed
 ### Provision a User (Python)
 
 ```python
-from iam_provisioner import IAMProvisioner, UserRequest
+from entra_provisioner import EntraProvisioner, UserRequest
 
-provisioner = IAMProvisioner(demo_mode=True)
+provisioner = EntraProvisioner(demo_mode=True)
 
 # Create user request
 request = UserRequest(
@@ -234,7 +237,7 @@ request = UserRequest(
     last_name="Smith"
 )
 
-# Provision in both AD and AWS
+# Provision in Entra ID
 result = provisioner.create_user(request)
 print(f"User created: {result.success}")
 print(f"Groups assigned: {result.groups_assigned}")
@@ -259,42 +262,42 @@ Designed to be extremely cost-effective:
 
 | Service | Cost | Notes |
 |---------|------|-------|
-| IAM | **Free** | Within AWS limits |
-| Secrets Manager | ~$0.40/secret/month | Encrypted credential storage |
-| S3 (audit logs) | ~$0.50/month | 7-year retention |
-| SNS (notifications) | ~$0.50/month | Manager alerts |
-| CloudTrail | **Free** | First trail included |
-| KMS (encryption keys) | ~$1/key/month | 2-3 keys typical |
-| **Total** | **$2-5/month** | *Plus minimal data transfer* |
+| Microsoft Entra ID | **Included** | Sign-in activity reports need Entra ID P1 |
+| Azure Key Vault (Standard) | ~$0.03 per 10,000 operations | Encrypted credential storage |
+| Storage (audit archive) | Cents per GB/month | Cool and archive tiers, 7-year retention |
+| Microsoft Graph sendMail | **Included** | Uses an existing Exchange Online mailbox |
+| Microsoft Entra audit logs | **Included** | Exported to the archive with a diagnostic setting |
+| Managed identity | **Free** | Automation identity |
+| **Total** | **Under $1/month** | *Plus licensing already in place* |
 
 ---
 
 ## What I Learned Building This
 
-✅ **Hybrid cloud orchestration** - Bridging on-premises AD with AWS IAM seamlessly  
-✅ **Infrastructure as Code** - CloudFormation templates for repeatable deployments  
-✅ **Security best practices** - Encryption, audit trails, least privilege IAM  
+✅ **Hybrid identity orchestration** - Bridging on-premises AD with Microsoft Entra ID  
+✅ **Infrastructure as Code** - Bicep templates for repeatable deployments  
+✅ **Security best practices** - Encryption, audit trails, least-privilege RBAC  
 ✅ **Operational maturity** - Error handling, logging, comprehensive compliance  
-✅ **Polyglot automation** - PowerShell + Python + Boto3 working together  
+✅ **Polyglot automation** - PowerShell + Python + Microsoft Graph working together  
 
 ---
 
 ## Roadmap
 
-- [ ] Lambda-based event-driven provisioning (real-time sync)
-- [ ] AWS Organizations multi-account support
-- [ ] Integration with AWS SSO / Identity Center
-- [ ] Terraform IaC alternative to CloudFormation
-- [ ] Okta/AzureAD connector support
+- [ ] Azure Functions event-driven provisioning (real-time sync)
+- [ ] Multi-tenant support
+- [ ] Integration with Microsoft Entra ID Governance (lifecycle workflows, access reviews)
+- [ ] Terraform IaC alternative to Bicep
+- [ ] Okta connector support
 
 ---
 
 ## Author
 
 **Mohammad Khan**  
-AWS Certified Solutions Architect Associate  
-IT Operations Specialist @ Nagarro (NYCPS/OPT)  
-University of Houston (CIS)
+Information Technology Specialist | IAM & Microsoft Security @ Accredo Packaging  
+AWS Certified Solutions Architect – Associate · SC-300 Microsoft Identity and Access Administrator (exam scheduled Nov 2026)  
+University of Houston (B.S., Computer & Information Systems Security / Information Assurance)
 
 [🔗 LinkedIn](https://linkedin.com/in/mohammad-jkhan) · [🔗 GitHub](https://github.com/Mjkhan9)
 
@@ -304,4 +307,4 @@ University of Houston (CIS)
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-*Created for educational and portfolio demonstration purposes. For production use, customize security policies and AWS account setup to match your organization's requirements.*
+*Created for educational and portfolio demonstration purposes. For production use, customize security policies and tenant setup to match your organization's requirements.*

@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
   <defs>
     <!-- Gradients -->
-    <linearGradient id="awsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#FF9900;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#FF6600;stop-opacity:1" />
     </linearGradient>
@@ -44,7 +44,7 @@
     IAM Lifecycle Automation Platform - Architecture
   </text>
   <text x="600" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#94A3B8" text-anchor="middle">
-    Enterprise Identity Management with AWS and Active Directory
+    Enterprise Identity Management with Microsoft Entra ID and Active Directory
   </text>
   
   <!-- HR System Box -->
@@ -87,65 +87,65 @@
     </g>
   </g>
   
-  <!-- AWS Cloud Section -->
+  <!-- Microsoft Cloud Section -->
   <g transform="translate(620, 90)">
     <!-- Section Background -->
     <rect width="530" height="380" rx="12" fill="rgba(255,153,0,0.1)" stroke="#FF9900" stroke-width="2" stroke-dasharray="5,5"/>
-    <text x="265" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#FF9900" text-anchor="middle">AWS Cloud (VPC)</text>
-    
-    <!-- Python/Boto3 Scripts -->
+    <text x="265" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#FF9900" text-anchor="middle">Microsoft Cloud (Entra ID + Azure)</text>
+
+    <!-- Python/Microsoft Graph Scripts -->
     <g transform="translate(20, 50)">
       <rect width="150" height="80" rx="8" fill="#1E3A5F" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#FCD34D" text-anchor="middle">🐍 Python Boto3</text>
-      <text x="75" y="45" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">iam_provisioner.py</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#FCD34D" text-anchor="middle">🐍 Python + Graph</text>
+      <text x="75" y="45" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">entra_provisioner.py</text>
       <text x="75" y="60" font-family="monospace" font-size="8" fill="#94A3B8" text-anchor="middle">compliance_audit.py</text>
     </g>
     
-    <!-- IAM Services -->
+    <!-- Entra ID Services -->
     <g transform="translate(190, 50)">
-      <rect width="150" height="80" rx="8" fill="url(#awsGrad)" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">👤 AWS IAM</text>
-      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Users • Groups</text>
-      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Policies • Roles</text>
+      <rect width="150" height="80" rx="8" fill="url(#cloudGrad)" filter="url(#shadow)"/>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">👤 Microsoft Entra ID</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Users • Security Groups</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">RBAC Directory Roles</text>
     </g>
     
-    <!-- Secrets Manager -->
+    <!-- Azure Key Vault -->
     <g transform="translate(360, 50)">
       <rect width="150" height="80" rx="8" fill="#DD3522" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔑 Secrets Manager</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔑 Azure Key Vault</text>
       <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Credential Storage</text>
-      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Auto Rotation</text>
+      <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Secret Versioning</text>
     </g>
     
-    <!-- S3 Bucket -->
+    <!-- Blob Storage -->
     <g transform="translate(20, 160)">
       <rect width="150" height="80" rx="8" fill="#569A31" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📦 S3 Bucket</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📦 Blob Storage</text>
       <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Audit Archives</text>
       <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">7-Year Retention</text>
     </g>
     
-    <!-- SNS -->
+    <!-- Graph sendMail -->
     <g transform="translate(190, 160)">
       <rect width="150" height="80" rx="8" fill="#B0084D" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📢 SNS</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📢 Graph sendMail</text>
       <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Notifications</text>
       <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Manager Alerts</text>
     </g>
     
-    <!-- CloudTrail -->
+    <!-- Entra Audit Logs -->
     <g transform="translate(360, 160)">
       <rect width="150" height="80" rx="8" fill="#7B1FA2" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📊 CloudTrail</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">📊 Entra Audit Logs</text>
       <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Audit Logging</text>
       <text x="75" y="60" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Compliance</text>
     </g>
     
-    <!-- KMS -->
+    <!-- Managed Identity -->
     <g transform="translate(190, 270)">
       <rect width="150" height="60" rx="8" fill="url(#securityGrad)" filter="url(#shadow)"/>
-      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔐 KMS</text>
-      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Encryption Keys</text>
+      <text x="75" y="25" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">🔐 Managed Identity</text>
+      <text x="75" y="45" font-family="Inter, system-ui, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)" text-anchor="middle">Key Vault + Storage RBAC</text>
     </g>
   </g>
   
@@ -176,31 +176,31 @@
   <line x1="580" y1="165" x2="620" y2="165" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
   <text x="600" y="155" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">4</text>
   
-  <!-- Python to IAM -->
+  <!-- Python to Entra ID -->
   <line x1="790" y1="180" x2="810" y2="180" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
   <text x="800" y="170" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">5</text>
   
-  <!-- Python to Secrets Manager -->
+  <!-- Python to Key Vault -->
   <line x1="790" y1="165" x2="980" y2="165" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
   <text x="885" y="155" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">6</text>
   
-  <!-- Python to SNS -->
+  <!-- Python to Graph sendMail -->
   <line x1="715" y1="220" x2="715" y2="250" stroke="#FF9900" stroke-width="2"/>
   <line x1="715" y1="250" x2="865" y2="250" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
   <text x="790" y="240" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">7</text>
   
-  <!-- SNS to Email -->
+  <!-- Graph sendMail to Email -->
   <line x1="885" y1="330" x2="885" y2="530" stroke="#6B7280" stroke-width="2"/>
   <line x1="885" y1="530" x2="1010" y2="560" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
   <text x="940" y="545" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">8</text>
   
-  <!-- CloudTrail to S3 -->
+  <!-- Entra Audit Logs to Blob Storage -->
   <line x1="1055" y1="330" x2="1055" y2="370" stroke="#6B7280" stroke-width="2"/>
   <line x1="1055" y1="370" x2="715" y2="370" stroke="#6B7280" stroke-width="2"/>
   <line x1="715" y1="370" x2="715" y2="330" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowhead)"/>
   <text x="885" y="382" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#94A3B8" text-anchor="middle">9</text>
   
-  <!-- KMS connections (dashed) -->
+  <!-- Managed identity connections (dashed) -->
   <line x1="885" y1="450" x2="1055" y2="305" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
   <line x1="885" y1="450" x2="1105" y2="220" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
   <line x1="885" y1="450" x2="715" y2="330" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
@@ -218,12 +218,12 @@
     
     <g transform="translate(200, 45)">
       <line x1="0" y1="10" x2="40" y2="10" stroke="#FF9900" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
-      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">AWS API Call</text>
+      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Graph API Call</text>
     </g>
     
     <g transform="translate(370, 45)">
       <line x1="0" y1="10" x2="40" y2="10" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
-      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Encryption</text>
+      <text x="50" y="15" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Identity Access</text>
     </g>
     
     <g transform="translate(520, 45)">
@@ -232,8 +232,8 @@
     </g>
     
     <g transform="translate(650, 45)">
-      <rect width="15" height="15" rx="3" fill="url(#awsGrad)"/>
-      <text x="25" y="13" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">AWS Services</text>
+      <rect width="15" height="15" rx="3" fill="url(#cloudGrad)"/>
+      <text x="25" y="13" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#94A3B8">Entra ID + Azure</text>
     </g>
     
     <g transform="translate(790, 45)">
@@ -243,7 +243,7 @@
     
     <!-- Flow Steps -->
     <text x="550" y="75" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#64748B" text-anchor="middle">
-      1: HR Event → 2: AD Account → 3: Groups → 4: Trigger AWS → 5: IAM User → 6: Store Creds → 7: SNS Notify → 8: Email → 9: Audit Log
+      1: HR Event → 2: AD Account → 3: Groups → 4: Trigger Entra → 5: Entra User → 6: Store Creds → 7: Graph Mail → 8: Email → 9: Audit Log
     </text>
   </g>
   

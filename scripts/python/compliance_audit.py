@@ -1,24 +1,25 @@
 """
-AWS IAM Compliance Audit System
+Microsoft Entra ID Compliance Audit System
 Author: Mohammad Khan
 Date: December 2025
 
-Automated compliance scanning for AWS IAM:
-- Credential age analysis
+Automated compliance scanning for Microsoft Entra ID:
+- App credential (client secret) age analysis
 - MFA enforcement verification
-- Unused access detection
-- Policy attachment review
-- CIS Benchmark alignment
+- Inactive account detection
+- Directory role assignment review
+- CIS Microsoft 365 Foundations Benchmark alignment
 """
 
-import boto3
 import json
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
-from botocore.exceptions import ClientError
+
+import requests
+from azure.identity import DefaultAzureCredential
 
 # ============================================================================
 # CONFIGURATION
@@ -26,9 +27,13 @@ from botocore.exceptions import ClientError
 
 DEMO_MODE = True
 
+# Microsoft Graph
+GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0"
+GRAPH_SCOPE = "https://graph.microsoft.com/.default"
+
 # Compliance thresholds
 MAX_PASSWORD_AGE_DAYS = 90
-MAX_ACCESS_KEY_AGE_DAYS = 90
+MAX_ACCESS_KEY_AGE_DAYS = 90  # app client secret age
 MAX_UNUSED_DAYS = 45
 REQUIRE_MFA = True
 
@@ -70,7 +75,7 @@ class Finding:
     description: str
     recommendation: str
     details: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict:
         return {
             "rule_id": self.rule_id,
@@ -97,7 +102,7 @@ class AuditReport:
     low_count: int
     compliance_score: float
     findings: List[Finding]
-    
+
     def to_dict(self) -> Dict:
         return {
             "scan_timestamp": self.scan_timestamp,
@@ -121,69 +126,69 @@ class AuditReport:
 DEMO_USERS = [
     {
         "UserName": "admin_user",
-        "UserId": "AIDAEXAMPLE1",
+        "UserId": "11111111-0000-0000-0000-000000000001",
         "CreateDate": datetime.now(timezone.utc) - timedelta(days=400),
-        "PasswordLastUsed": datetime.now(timezone.utc) - timedelta(days=5),
-        "MFADevices": [],
-        "AccessKeys": [
-            {"AccessKeyId": "AKIAEXAMPLE1", "Status": "Active", 
+        "LastSignIn": datetime.now(timezone.utc) - timedelta(days=5),
+        "MFAMethods": [],
+        "AppCredentials": [
+            {"KeyId": "secret-admin-1", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=200)}
         ],
-        "AttachedPolicies": [{"PolicyName": "AdministratorAccess", "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"}],
+        "DirectoryRoles": [{"RoleName": "Global Administrator", "RoleId": "62e90394-69f5-4237-9190-012177145e10"}],
         "Groups": ["Administrators"]
     },
     {
         "UserName": "developer_jane",
-        "UserId": "AIDAEXAMPLE2",
+        "UserId": "11111111-0000-0000-0000-000000000002",
         "CreateDate": datetime.now(timezone.utc) - timedelta(days=180),
-        "PasswordLastUsed": datetime.now(timezone.utc) - timedelta(days=2),
-        "MFADevices": [{"SerialNumber": "arn:aws:iam::123456789012:mfa/developer_jane"}],
-        "AccessKeys": [
-            {"AccessKeyId": "AKIAEXAMPLE2", "Status": "Active",
+        "LastSignIn": datetime.now(timezone.utc) - timedelta(days=2),
+        "MFAMethods": [{"Type": "microsoftAuthenticatorAuthenticationMethod"}],
+        "AppCredentials": [
+            {"KeyId": "secret-jane-1", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=60)}
         ],
-        "AttachedPolicies": [],
+        "DirectoryRoles": [],
         "Groups": ["Developers"]
     },
     {
         "UserName": "inactive_user",
-        "UserId": "AIDAEXAMPLE3",
+        "UserId": "11111111-0000-0000-0000-000000000003",
         "CreateDate": datetime.now(timezone.utc) - timedelta(days=365),
-        "PasswordLastUsed": datetime.now(timezone.utc) - timedelta(days=120),
-        "MFADevices": [],
-        "AccessKeys": [
-            {"AccessKeyId": "AKIAEXAMPLE3", "Status": "Active",
+        "LastSignIn": datetime.now(timezone.utc) - timedelta(days=120),
+        "MFAMethods": [],
+        "AppCredentials": [
+            {"KeyId": "secret-inactive-1", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=300)}
         ],
-        "AttachedPolicies": [{"PolicyName": "PowerUserAccess", "PolicyArn": "arn:aws:iam::aws:policy/PowerUserAccess"}],
+        "DirectoryRoles": [{"RoleName": "Privileged Role Administrator", "RoleId": "e8611ab8-c189-46e8-94e1-60213ab1f814"}],
         "Groups": []
     },
     {
         "UserName": "service_account",
-        "UserId": "AIDAEXAMPLE4",
+        "UserId": "11111111-0000-0000-0000-000000000004",
         "CreateDate": datetime.now(timezone.utc) - timedelta(days=500),
-        "PasswordLastUsed": None,
-        "MFADevices": [],
-        "AccessKeys": [
-            {"AccessKeyId": "AKIAEXAMPLE4", "Status": "Active",
+        "LastSignIn": None,
+        "MFAMethods": [],
+        "AppCredentials": [
+            {"KeyId": "secret-svc-1", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=500)},
-            {"AccessKeyId": "AKIAEXAMPLE5", "Status": "Active",
+            {"KeyId": "secret-svc-2", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=30)}
         ],
-        "AttachedPolicies": [],
+        "DirectoryRoles": [],
         "Groups": ["ServiceAccounts"]
     },
     {
         "UserName": "compliant_user",
-        "UserId": "AIDAEXAMPLE5",
+        "UserId": "11111111-0000-0000-0000-000000000005",
         "CreateDate": datetime.now(timezone.utc) - timedelta(days=60),
-        "PasswordLastUsed": datetime.now(timezone.utc) - timedelta(days=1),
-        "MFADevices": [{"SerialNumber": "arn:aws:iam::123456789012:mfa/compliant_user"}],
-        "AccessKeys": [
-            {"AccessKeyId": "AKIAEXAMPLE6", "Status": "Active",
+        "LastSignIn": datetime.now(timezone.utc) - timedelta(days=1),
+        "MFAMethods": [{"Type": "fido2AuthenticationMethod"}],
+        "AppCredentials": [
+            {"KeyId": "secret-compliant-1", "Status": "Active",
              "CreateDate": datetime.now(timezone.utc) - timedelta(days=30)}
         ],
-        "AttachedPolicies": [],
+        "DirectoryRoles": [],
         "Groups": ["StandardUsers"]
     }
 ]
@@ -195,34 +200,49 @@ DEMO_USERS = [
 
 class IAMComplianceAuditor:
     """
-    AWS IAM Compliance Auditor
-    
+    Microsoft Entra ID Compliance Auditor
+
     Checks for:
-    - CIS AWS Foundations Benchmark rules
+    - CIS Microsoft 365 Foundations Benchmark v5.0.0 rules
     - Password policy compliance
     - MFA enforcement
-    - Access key rotation
-    - Unused credentials
-    - Overly permissive policies
+    - App credential rotation
+    - Inactive accounts
+    - Standing privileged role assignments
     """
-    
+
     def __init__(self, demo_mode: bool = DEMO_MODE):
         self.demo_mode = demo_mode
         self.findings: List[Finding] = []
         self._iam_client = None
-        
+        self._credential = None
+
         if not demo_mode:
-            self._iam_client = boto3.client('iam')
-        
+            self._credential = DefaultAzureCredential()
+            self._iam_client = requests.Session()
+
         logger.info(f"IAMComplianceAuditor initialized (Demo: {demo_mode})")
-    
+
+    def _graph_get(self, path: str) -> List[Dict]:
+        """GET a Microsoft Graph collection, following @odata.nextLink pages"""
+        token = self._credential.get_token(GRAPH_SCOPE).token
+        url = f"{GRAPH_BASE_URL}{path}"
+        items = []
+        while url:
+            response = self._iam_client.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=30)
+            response.raise_for_status()
+            page = response.json()
+            items.extend(page.get("value", []))
+            url = page.get("@odata.nextLink")
+        return items
+
     def run_full_audit(self) -> AuditReport:
-        """Execute complete IAM compliance audit"""
-        logger.info("Starting IAM compliance audit...")
+        """Execute complete Entra ID compliance audit"""
+        logger.info("Starting Entra ID compliance audit...")
         self.findings = []
-        
+
         users = self._get_users()
-        
+
         for user in users:
             self._check_mfa_enabled(user)
             self._check_access_key_age(user)
@@ -230,231 +250,260 @@ class IAMComplianceAuditor:
             self._check_multiple_access_keys(user)
             self._check_direct_policy_attachment(user)
             self._check_admin_privileges(user)
-        
-        # Account-level checks
+
+        # Tenant-level checks
         self._check_password_policy()
         self._check_root_account()
-        
+
         return self._generate_report(len(users))
-    
+
     def _get_users(self) -> List[Dict]:
-        """Get all IAM users"""
+        """Get all Entra ID users"""
         if self.demo_mode:
             logger.info(f"[DEMO] Returning {len(DEMO_USERS)} sample users")
             return DEMO_USERS
-        
+
         users = []
-        paginator = self._iam_client.get_paginator('list_users')
-        
-        for page in paginator.paginate():
-            for user in page['Users']:
-                # Enrich with additional data
-                user_data = self._enrich_user_data(user)
-                users.append(user_data)
-        
+        for user in self._graph_get("/users?$select=id,userPrincipalName,createdDateTime,signInActivity"):
+            # Enrich with additional data
+            user_data = self._enrich_user_data(user)
+            users.append(user_data)
+
         return users
-    
+
+    @staticmethod
+    def _parse_time(value: Optional[str]) -> Optional[datetime]:
+        if not value:
+            return None
+        return datetime.fromisoformat(value.replace('Z', '+00:00'))
+
     def _enrich_user_data(self, user: Dict) -> Dict:
-        """Add MFA, access keys, and policy data to user"""
-        username = user['UserName']
-        
-        # Get MFA devices
-        mfa_response = self._iam_client.list_mfa_devices(UserName=username)
-        user['MFADevices'] = mfa_response['MFADevices']
-        
-        # Get access keys
-        keys_response = self._iam_client.list_access_keys(UserName=username)
-        user['AccessKeys'] = keys_response['AccessKeyMetadata']
-        
-        # Get attached policies
-        policies_response = self._iam_client.list_attached_user_policies(UserName=username)
-        user['AttachedPolicies'] = policies_response['AttachedPolicies']
-        
+        """Add MFA methods, app credentials, directory roles and groups to user"""
+        user_id = user['id']
+        now = datetime.now(timezone.utc)
+
+        # Get registered authentication methods (password alone is not MFA)
+        methods = self._graph_get(f"/users/{user_id}/authentication/methods")
+        mfa_methods = [
+            {"Type": m.get("@odata.type", "").split(".")[-1]}
+            for m in methods
+            if not m.get("@odata.type", "").endswith("passwordAuthenticationMethod")
+        ]
+
+        # Get client secrets on app registrations the user owns
+        apps = self._graph_get(f"/users/{user_id}/ownedObjects/microsoft.graph.application?$select=passwordCredentials")
+        app_credentials = []
+        for app in apps:
+            for cred in app.get("passwordCredentials", []):
+                end = self._parse_time(cred.get("endDateTime"))
+                app_credentials.append({
+                    "KeyId": cred.get("keyId"),
+                    "Status": "Active" if end is None or end > now else "Expired",
+                    "CreateDate": self._parse_time(cred.get("startDateTime"))
+                })
+
+        # Get directory roles assigned directly to the user
+        assignments = self._graph_get(
+            f"/roleManagement/directory/roleAssignments?$filter=principalId eq '{user_id}'&$expand=roleDefinition"
+        )
+        directory_roles = [
+            {"RoleName": a["roleDefinition"]["displayName"], "RoleId": a["roleDefinitionId"]}
+            for a in assignments
+        ]
+
         # Get groups
-        groups_response = self._iam_client.list_groups_for_user(UserName=username)
-        user['Groups'] = [g['GroupName'] for g in groups_response['Groups']]
-        
-        return user
-    
+        groups = self._graph_get(f"/users/{user_id}/memberOf/microsoft.graph.group?$select=displayName")
+
+        return {
+            "UserName": user['userPrincipalName'],
+            "UserId": user_id,
+            "CreateDate": self._parse_time(user.get('createdDateTime')),
+            "LastSignIn": self._parse_time((user.get('signInActivity') or {}).get('lastSignInDateTime')),
+            "MFAMethods": mfa_methods,
+            "AppCredentials": app_credentials,
+            "DirectoryRoles": directory_roles,
+            "Groups": [g['displayName'] for g in groups]
+        }
+
     # ========================================================================
     # COMPLIANCE CHECKS
     # ========================================================================
-    
+
     def _check_mfa_enabled(self, user: Dict):
-        """CIS 1.2: Ensure MFA is enabled for all IAM users with console access"""
+        """CIS M365 5.2.2.2: Ensure multifactor authentication is enabled for all users"""
         username = user['UserName']
-        has_mfa = len(user.get('MFADevices', [])) > 0
-        has_console = user.get('PasswordLastUsed') is not None
-        
-        if has_console and not has_mfa:
+        has_mfa = len(user.get('MFAMethods', [])) > 0
+        has_sign_in = user.get('LastSignIn') is not None
+
+        if has_sign_in and not has_mfa:
             self.findings.append(Finding(
-                rule_id="CIS-1.2",
-                rule_name="MFA for Console Users",
-                resource_type="IAM User",
+                rule_id="CIS-5.2.2.2",
+                rule_name="MFA for All Users",
+                resource_type="Entra User",
                 resource_id=username,
                 severity=Severity.HIGH,
                 status=ComplianceStatus.NON_COMPLIANT,
-                description=f"User {username} has console access but MFA is not enabled",
-                recommendation="Enable MFA for this user immediately",
-                details={"has_console_access": True, "mfa_enabled": False}
+                description=f"User {username} signs in interactively but has no MFA method registered",
+                recommendation="Require MFA registration for this user immediately",
+                details={"has_sign_in_activity": True, "mfa_registered": False}
             ))
-            logger.warning(f"[NON-COMPLIANT] {username}: MFA not enabled")
-    
+            logger.warning(f"[NON-COMPLIANT] {username}: MFA not registered")
+
     def _check_access_key_age(self, user: Dict):
-        """CIS 1.4: Ensure access keys are rotated within 90 days"""
+        """Best practice: Rotate app client secrets within 90 days"""
         username = user['UserName']
-        
-        for key in user.get('AccessKeys', []):
+
+        for key in user.get('AppCredentials', []):
             if key['Status'] != 'Active':
                 continue
-            
+
             create_date = key['CreateDate']
             if isinstance(create_date, str):
                 create_date = datetime.fromisoformat(create_date.replace('Z', '+00:00'))
-            
+
             age_days = (datetime.now(timezone.utc) - create_date).days
-            
+
             if age_days > MAX_ACCESS_KEY_AGE_DAYS:
                 self.findings.append(Finding(
-                    rule_id="CIS-1.4",
-                    rule_name="Access Key Rotation",
-                    resource_type="IAM Access Key",
-                    resource_id=f"{username}/{key['AccessKeyId']}",
+                    rule_id="BP-3",
+                    rule_name="App Credential Rotation",
+                    resource_type="App Client Secret",
+                    resource_id=f"{username}/{key['KeyId']}",
                     severity=Severity.MEDIUM,
                     status=ComplianceStatus.NON_COMPLIANT,
-                    description=f"Access key is {age_days} days old (max: {MAX_ACCESS_KEY_AGE_DAYS})",
-                    recommendation="Rotate access key immediately",
+                    description=f"Client secret is {age_days} days old (max: {MAX_ACCESS_KEY_AGE_DAYS})",
+                    recommendation="Rotate the client secret, or move the app to a certificate or managed identity",
                     details={"key_age_days": age_days, "threshold": MAX_ACCESS_KEY_AGE_DAYS}
                 ))
-                logger.warning(f"[NON-COMPLIANT] {username}: Access key {age_days} days old")
-    
+                logger.warning(f"[NON-COMPLIANT] {username}: Client secret {age_days} days old")
+
     def _check_unused_credentials(self, user: Dict):
-        """CIS 1.3: Ensure credentials unused for 45+ days are disabled"""
+        """Best practice: Disable accounts with no sign-in for 45+ days"""
         username = user['UserName']
-        
-        # Check password
-        last_used = user.get('PasswordLastUsed')
+
+        # Check last sign-in
+        last_used = user.get('LastSignIn')
         if last_used:
             if isinstance(last_used, str):
                 last_used = datetime.fromisoformat(last_used.replace('Z', '+00:00'))
-            
+
             days_unused = (datetime.now(timezone.utc) - last_used).days
-            
+
             if days_unused > MAX_UNUSED_DAYS:
                 self.findings.append(Finding(
-                    rule_id="CIS-1.3",
-                    rule_name="Unused Credentials",
-                    resource_type="IAM User Password",
+                    rule_id="BP-4",
+                    rule_name="Inactive Account",
+                    resource_type="Entra User Sign-in",
                     resource_id=username,
                     severity=Severity.MEDIUM,
                     status=ComplianceStatus.NON_COMPLIANT,
-                    description=f"Password unused for {days_unused} days",
-                    recommendation="Disable or remove unused credentials",
+                    description=f"No sign-in for {days_unused} days",
+                    recommendation="Disable the account or confirm it through an access review",
                     details={"days_unused": days_unused, "threshold": MAX_UNUSED_DAYS}
                 ))
-    
+
     def _check_multiple_access_keys(self, user: Dict):
-        """Best practice: Users should have at most one active access key"""
+        """Best practice: Apps should have at most one active client secret"""
         username = user['UserName']
-        active_keys = [k for k in user.get('AccessKeys', []) if k['Status'] == 'Active']
-        
+        active_keys = [k for k in user.get('AppCredentials', []) if k['Status'] == 'Active']
+
         if len(active_keys) > 1:
             self.findings.append(Finding(
                 rule_id="BP-1",
-                rule_name="Multiple Access Keys",
-                resource_type="IAM User",
+                rule_name="Multiple App Credentials",
+                resource_type="Entra User",
                 resource_id=username,
                 severity=Severity.LOW,
                 status=ComplianceStatus.NON_COMPLIANT,
-                description=f"User has {len(active_keys)} active access keys",
-                recommendation="Remove unused access keys",
+                description=f"User owns {len(active_keys)} active client secrets",
+                recommendation="Remove unused client secrets",
                 details={"active_key_count": len(active_keys)}
             ))
-    
+
     def _check_direct_policy_attachment(self, user: Dict):
-        """Best practice: Use groups for policy assignment"""
+        """Best practice: Use role-assignable groups for directory role assignment"""
         username = user['UserName']
-        direct_policies = user.get('AttachedPolicies', [])
-        
-        if direct_policies:
+        direct_roles = user.get('DirectoryRoles', [])
+
+        if direct_roles:
             self.findings.append(Finding(
                 rule_id="BP-2",
-                rule_name="Direct Policy Attachment",
-                resource_type="IAM User",
+                rule_name="Direct Role Assignment",
+                resource_type="Entra User",
                 resource_id=username,
                 severity=Severity.LOW,
                 status=ComplianceStatus.NON_COMPLIANT,
-                description=f"User has {len(direct_policies)} directly attached policies",
-                recommendation="Use IAM groups for policy management",
-                details={"policies": [p['PolicyName'] for p in direct_policies]}
+                description=f"User has {len(direct_roles)} directly assigned directory roles",
+                recommendation="Assign directory roles through role-assignable security groups",
+                details={"roles": [r['RoleName'] for r in direct_roles]}
             ))
-    
+
     def _check_admin_privileges(self, user: Dict):
-        """CIS 1.16: Ensure IAM policies with full admin privileges are not attached"""
+        """Best practice: No standing assignment of the most privileged directory roles"""
         username = user['UserName']
-        admin_policies = ['AdministratorAccess', 'PowerUserAccess']
-        
-        for policy in user.get('AttachedPolicies', []):
-            if policy['PolicyName'] in admin_policies:
+        admin_roles = ['Global Administrator', 'Privileged Role Administrator']
+
+        for role in user.get('DirectoryRoles', []):
+            if role['RoleName'] in admin_roles:
                 self.findings.append(Finding(
-                    rule_id="CIS-1.16",
-                    rule_name="Admin Privilege Check",
-                    resource_type="IAM User",
+                    rule_id="BP-5",
+                    rule_name="Standing Privileged Role",
+                    resource_type="Entra User",
                     resource_id=username,
                     severity=Severity.CRITICAL,
                     status=ComplianceStatus.NON_COMPLIANT,
-                    description=f"User has {policy['PolicyName']} attached directly",
-                    recommendation="Use least-privilege policies instead",
-                    details={"policy": policy['PolicyName']}
+                    description=f"User has {role['RoleName']} assigned directly",
+                    recommendation="Use least-privilege roles, with just-in-time elevation for admin tasks",
+                    details={"role": role['RoleName']}
                 ))
-                logger.error(f"[CRITICAL] {username}: Has {policy['PolicyName']}")
-    
+                logger.error(f"[CRITICAL] {username}: Has {role['RoleName']}")
+
     def _check_password_policy(self):
-        """CIS 1.5-1.11: Password policy checks"""
+        """CIS M365 1.3.1: Password expiration policy"""
         if self.demo_mode:
-            # Simulate a weak password policy finding
+            # Simulate a password expiration policy finding
             self.findings.append(Finding(
-                rule_id="CIS-1.9",
-                rule_name="Password Reuse Prevention",
-                resource_type="Account Password Policy",
+                rule_id="CIS-1.3.1",
+                rule_name="Password Expiration Policy",
+                resource_type="Tenant Password Policy",
                 resource_id="PasswordPolicy",
                 severity=Severity.MEDIUM,
                 status=ComplianceStatus.NON_COMPLIANT,
-                description="Password policy does not prevent reuse of last 24 passwords",
-                recommendation="Set PasswordReusePrevention to 24",
-                details={"current_value": 12, "required_value": 24}
+                description="Passwords are set to expire every 90 days",
+                recommendation="Set passwords to never expire (recommended), with MFA and password protection",
+                details={"current_value": 90, "required_value": "never expire"}
             ))
-    
+
     def _check_root_account(self):
-        """CIS 1.1: Avoid use of root account"""
+        """CIS M365 1.1.2: Ensure two emergency access accounts have been defined"""
         if self.demo_mode:
             self.findings.append(Finding(
-                rule_id="CIS-1.1",
-                rule_name="Root Account Usage",
-                resource_type="Root Account",
-                resource_id="root",
+                rule_id="CIS-1.1.2",
+                rule_name="Emergency Access Accounts",
+                resource_type="Emergency Access Account",
+                resource_id="break-glass",
                 severity=Severity.INFO,
                 status=ComplianceStatus.COMPLIANT,
-                description="Root account has not been used in the last 90 days",
-                recommendation="Continue avoiding root account usage",
-                details={"last_used": "Never or >90 days"}
+                description="Two emergency access accounts are defined and unused in the last 90 days",
+                recommendation="Keep monitoring emergency access sign-ins",
+                details={"accounts": 2, "last_used": "Never or >90 days"}
             ))
-    
+
     # ========================================================================
     # REPORTING
     # ========================================================================
-    
+
     def _generate_report(self, total_users: int) -> AuditReport:
         """Generate comprehensive audit report"""
         critical = len([f for f in self.findings if f.severity == Severity.CRITICAL])
         high = len([f for f in self.findings if f.severity == Severity.HIGH])
         medium = len([f for f in self.findings if f.severity == Severity.MEDIUM])
         low = len([f for f in self.findings if f.severity == Severity.LOW])
-        
+
         non_compliant = len([f for f in self.findings if f.status == ComplianceStatus.NON_COMPLIANT])
         total_checks = len(self.findings)
         compliance_score = ((total_checks - non_compliant) / max(total_checks, 1)) * 100
-        
+
         return AuditReport(
             scan_timestamp=datetime.now().isoformat(),
             total_users=total_users,
@@ -466,11 +515,11 @@ class IAMComplianceAuditor:
             compliance_score=compliance_score,
             findings=self.findings
         )
-    
+
     def print_report(self, report: AuditReport):
         """Print formatted audit report"""
         print("\n" + "=" * 70)
-        print("  AWS IAM COMPLIANCE AUDIT REPORT")
+        print("  MICROSOFT ENTRA ID COMPLIANCE AUDIT REPORT")
         print("=" * 70)
         print(f"  Scan Time:        {report.scan_timestamp}")
         print(f"  Users Scanned:    {report.total_users}")
@@ -484,7 +533,7 @@ class IAMComplianceAuditor:
         print("-" * 70)
         print(f"  COMPLIANCE SCORE: {report.compliance_score:.1f}%")
         print("=" * 70)
-        
+
         if report.critical_count > 0 or report.high_count > 0:
             print("\n⚠️  CRITICAL/HIGH FINDINGS:")
             for finding in report.findings:
@@ -493,7 +542,7 @@ class IAMComplianceAuditor:
                     print(f"    Resource: {finding.resource_id}")
                     print(f"    Issue: {finding.description}")
                     print(f"    Fix: {finding.recommendation}")
-        
+
         print("")
 
 
@@ -503,14 +552,14 @@ class IAMComplianceAuditor:
 
 def main():
     print("\n" + "=" * 70)
-    print("  AWS IAM COMPLIANCE AUDIT SYSTEM")
-    print("  Mohammad Khan | AWS Solutions Architect")
+    print("  MICROSOFT ENTRA ID COMPLIANCE AUDIT SYSTEM")
+    print("  Mohammad Khan | Identity & Access Management")
     print("=" * 70 + "\n")
-    
+
     auditor = IAMComplianceAuditor(demo_mode=DEMO_MODE)
     report = auditor.run_full_audit()
     auditor.print_report(report)
-    
+
     # Export to JSON
     with open("audit_report.json", "w") as f:
         json.dump(report.to_dict(), f, indent=2, default=str)

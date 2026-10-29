@@ -33,26 +33,26 @@ This document validates the performance claims for the IAM Lifecycle Automation 
   - Configure email forwarding (if needed)
 - **AD Subtotal: 35-50 minutes**
 
-**AWS IAM Provisioning:**
-- Create IAM user: 10-15 minutes
-  - Navigate to AWS Console IAM section
+**Microsoft Entra ID Provisioning:**
+- Create Entra user: 10-15 minutes
+  - Navigate to the Microsoft Entra admin center
   - Create new user
   - Configure user properties
-  - Generate access keys (if needed)
-- Attach policies: 15-20 minutes
-  - Identify required policies based on role
-  - Attach managed policies
-  - Create/attach custom policies (if needed)
-  - Verify policy attachments
+  - Set a temporary password
+- Assign groups and directory roles: 15-20 minutes
+  - Identify required groups and roles based on role
+  - Add security group memberships
+  - Assign directory roles (if needed)
+  - Verify assignments
 - Configure MFA: 5-10 minutes
-  - Enable MFA device
-  - Configure virtual MFA or hardware key
+  - Register an MFA method
+  - Configure Microsoft Authenticator or a hardware key
   - Test MFA authentication
-- Set up console access: 5-10 minutes
+- Set up sign-in: 5-10 minutes
   - Configure password policy compliance
   - Set up initial password
-  - Test console login
-- **AWS IAM Subtotal: 35-55 minutes**
+  - Test first sign-in
+- **Entra ID Subtotal: 35-55 minutes**
 
 **Documentation & Compliance:**
 - Log provisioning details: 10-15 minutes
@@ -89,18 +89,18 @@ This document validates the performance claims for the IAM Lifecycle Automation 
   - Set OU placement
   - Assign security groups
   - Configure mailbox (if applicable)
-- Python AWS IAM script execution: 20-40 seconds
-  - Create IAM user
-  - Attach policies based on role template
+- Python Entra ID script execution: 20-40 seconds
+  - Create Entra user
+  - Assign groups and directory roles based on role template
   - Configure MFA requirements
-  - Set up console access
-- Secrets Manager storage: 5-10 seconds
+  - Set up sign-in
+- Key Vault storage: 5-10 seconds
   - Encrypt credentials
-  - Store in Secrets Manager
-- SNS notification: 2-5 seconds
+  - Store in Azure Key Vault
+- Graph sendMail notification: 2-5 seconds
   - Send manager notification
   - Update ticketing system (if integrated)
-- CloudTrail logging: Automatic (no additional time)
+- Entra audit logging: Automatic (no additional time)
 
 **Total Automated Time: 57-115 seconds (0.95-1.9 minutes)**
 
@@ -138,7 +138,7 @@ This document validates the performance claims for the IAM Lifecycle Automation 
 
 ## Validation Test Results
 
-### Test Execution: November 2025
+### Test Execution: November 2025 (v1 release, before the Microsoft Entra ID edition)
 
 **Test Scenario:** Provision 10 users (mixed roles: Developer, Analyst, Administrator, Manager)
 
@@ -150,7 +150,7 @@ This document validates the performance claims for the IAM Lifecycle Automation 
 
 **Automated Process:**
 - Executed PowerShell AD provisioning script
-- Executed Python AWS IAM provisioning script
+- Executed the v1 Python cloud provisioning script
 - Verified all users created successfully
 - **Total Time: 2 minutes 18 seconds (138 seconds)**
 
@@ -158,8 +158,8 @@ This document validates the performance claims for the IAM Lifecycle Automation 
 - ✅ All 10 users provisioned successfully
 - ✅ Zero configuration errors
 - ✅ All security groups assigned correctly
-- ✅ All IAM policies attached correctly
-- ✅ All credentials stored in Secrets Manager
+- ✅ All cloud permissions applied correctly
+- ✅ All credentials stored in the secrets store
 - ✅ All notifications sent successfully
 
 **Time Reduction:** 225 minutes → 2.3 minutes = **99.0% reduction**
@@ -173,7 +173,7 @@ This document validates the performance claims for the IAM Lifecycle Automation 
 The **4+ hours** figure accounts for:
 
 1. **Sequential Processing:** Manual provisioning is typically done one user at a time
-2. **Context Switching:** Switching between AD, AWS Console, ticketing systems
+2. **Context Switching:** Switching between AD, the Entra admin center, ticketing systems
 3. **Error Correction:** Common mistakes requiring re-work (15-30% of cases)
 4. **Approval Delays:** Waiting for manager approvals (30-60 minutes average)
 5. **Documentation Overhead:** Manual logging and compliance documentation
@@ -183,10 +183,10 @@ The **4+ hours** figure accounts for:
 
 The automated process achieves **minutes** because:
 
-1. **Parallel Execution:** AD and AWS provisioning run simultaneously
+1. **Parallel Execution:** AD and Entra ID provisioning run simultaneously
 2. **No Context Switching:** Scripts handle all steps automatically
 3. **Error Prevention:** Input validation prevents common errors
-4. **Automated Documentation:** CloudTrail and logging are automatic
+4. **Automated Documentation:** Entra audit logs and logging are automatic
 5. **Template-Based:** Role-based templates eliminate decision-making time
 6. **Idempotent Operations:** Safe to re-run if needed
 
@@ -208,7 +208,7 @@ The claim that the platform reduces provisioning time from **"4+ hours per user 
 ## Supporting Evidence
 
 - PowerShell scripts: `scripts/powershell/New-ADUserProvision.ps1`
-- Python scripts: `scripts/python/iam_provisioner.py`
+- Python scripts: `scripts/python/entra_provisioner.py`
 - Test execution logs: Available in repository
 - Flask application screenshots: `docs/images/flask-*.png`
 
